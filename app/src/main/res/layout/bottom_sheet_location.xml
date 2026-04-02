@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set Your Location"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <!-- GPS Button -->
+    <Button
+        android:id="@+id/btnUseGps"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="📍 Use My Current Location (GPS)"
+        android:backgroundTint="#1A237E"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="— or select manually —"
+        android:textColor="#888888"
+        android:textSize="12sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Province Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Province"
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/spinnerProvince"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/spinner_background"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Municipality Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="City / Municipality"
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/spinnerMunicipality"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/spinner_background"
+        android:layout_marginBottom="12dp"
+        android:enabled="false" />
+
+    <!-- Barangay Spinner -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Barangay (optional)"
+        android:textSize="13sp"
+        android:textColor="#555555"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/spinnerBarangay"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/spinner_background"
+        android:layout_marginBottom="20dp"
+        android:enabled="false" />
+
+    <!-- Confirm Button -->
+    <Button
+        android:id="@+id/btnConfirmLocation"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Confirm Location"
+        android:backgroundTint="#1A237E"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp" />
+
+</LinearLayout>

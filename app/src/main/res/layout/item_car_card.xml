@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="160dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- Car Image -->
+        <ImageView
+            android:id="@+id/ivCarImage"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_rentals" />
+
+        <!-- Car Name -->
+        <TextView
+            android:id="@+id/tvCarName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Car Name"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <!-- Distance -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:src="@drawable/ic_profile"
+                app:tint="#F44336" />
+
+            <TextView
+                android:id="@+id/tvDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1.2 KM Away"
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+        <!-- Tags: Transmission, Seats, Fuel -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/tvTransmission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto"
+                android:textSize="9sp"
+                android:textColor="#555555"
+                android:background="#EEEEEE"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/tvSeats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4 Seats"
+                android:textSize="9sp"
+                android:textColor="#555555"
+                android:background="#EEEEEE"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/tvFuel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gasoline"
+                android:textSize="9sp"
+                android:textColor="#555555"
+                android:background="#EEEEEE"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp" />
+
+        </LinearLayout>
+
+        <!-- Price + Button Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="₱3985/Day"
+                android:textColor="#1A237E"
+                android:textStyle="bold"
+                android:textSize="13sp" />
+
+            <ImageView
+                android:id="@+id/btnBook"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_explore"
+                android:background="#1A237E"
+                android:padding="6dp"
+                app:tint="#FFFFFF" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

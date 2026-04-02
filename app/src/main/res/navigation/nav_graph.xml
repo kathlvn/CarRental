@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/exploreFragment">
+
+    <fragment
+        android:id="@+id/exploreFragment"
+        android:name="com.mobcom.carrental.ExploreFragment"
+        android:label="Explore" />
+
+    <fragment
+        android:id="@+id/myRentalsFragment"
+        android:name="com.mobcom.carrental.MyRentalsFragment"
+        android:label="My Rentals" />
+
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.mobcom.carrental.MessagesFragment"
+        android:label="Messages" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.mobcom.carrental.ProfileFragment"
+        android:label="Profile" />
+
+</navigation>
