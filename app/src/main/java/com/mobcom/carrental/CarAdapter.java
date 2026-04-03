@@ -37,6 +37,13 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
         holder.tvFuel.setText(car.getFuelType());
         holder.tvPrice.setText("₱" + (int) car.getPricePerDay() + "/Day");
         holder.ivCarImage.setImageResource(car.getImageResId());
+
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onCarClick(car);
+        });
+        holder.itemView.findViewById(R.id.btnBook).setOnClickListener(v -> {
+            if (clickListener != null) clickListener.onCarClick(car);
+        });
     }
 
     @Override
@@ -59,4 +66,15 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
             tvPrice = itemView.findViewById(R.id.tvPrice);
         }
     }
+
+    public interface OnCarClickListener {
+        void onCarClick(Car car);
+    }
+
+    private OnCarClickListener clickListener;
+
+    public void setOnCarClickListener(OnCarClickListener listener) {
+        this.clickListener = listener;
+    }
+
 }

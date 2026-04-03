@@ -24,4 +24,9 @@
         android:name="com.mobcom.carrental.ProfileFragment"
         android:label="Profile" />
 
+    <fragment
+        android:id="@+id/carDetailFragment"
+        android:name="com.mobcom.carrental.CarDetailFragment"
+        android:label="Car Detail" />
+
 </navigation>
