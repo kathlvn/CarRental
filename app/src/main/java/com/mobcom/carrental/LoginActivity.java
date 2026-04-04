@@ -137,8 +137,7 @@ public class LoginActivity extends AppCompatActivity {
             goToCustomer();
         } else if (email.equals("provider@test.com") && password.equals("1234")) {
             new SessionManager(this).login("P001", "Maria Santos", email, SessionManager.ROLE_PROVIDER);
-            // TODO: goToProvider();
-            goToCustomer(); // temporary fallback
+            goToProvider();
         } else if (email.equals("admin@test.com") && password.equals("1234")) {
             new SessionManager(this).login("A001", "Admin User", email, SessionManager.ROLE_ADMIN);
             // TODO: goToAdmin();
@@ -206,4 +205,12 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private void goToProvider() {
+        Intent intent = new Intent(this, ProviderMainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
 }

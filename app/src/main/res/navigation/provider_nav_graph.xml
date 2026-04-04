@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/provider_nav_graph"
+    app:startDestination="@id/providerDashboardFragment">
+
+    <fragment
+        android:id="@+id/providerDashboardFragment"
+        android:name="com.mobcom.carrental.provider.ProviderDashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/providerMyCarsFragment"
+        android:name="com.mobcom.carrental.provider.ProviderMyCarsFragment"
+        android:label="My Cars" />
+
+    <fragment
+        android:id="@+id/providerBookingsFragment"
+        android:name="com.mobcom.carrental.provider.ProviderBookingsFragment"
+        android:label="Bookings" />
+
+    <fragment
+        android:id="@+id/providerProfileFragment"
+        android:name="com.mobcom.carrental.provider.ProviderProfileFragment"
+        android:label="Profile" />
+
+</navigation>

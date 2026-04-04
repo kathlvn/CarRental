@@ -33,10 +33,11 @@
         <!-- LOGIN: will be built next -->
         <activity android:name=".LoginActivity" />
 
-        <!-- MAIN: customer side (no longer the launcher) -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <activity android:name=".ProviderMainActivity" />
 
     </application>
 
