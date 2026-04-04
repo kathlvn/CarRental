@@ -15,15 +15,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.CarRental" >
+
+        <!-- SPLASH: now the launcher entry point -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true" >
+            android:name=".SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CarRental.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- WELCOME: guest/login/register choice screen -->
+        <activity android:name=".WelcomeActivity" />
+
+        <!-- LOGIN: will be built next -->
+        <activity android:name=".LoginActivity" />
+
+        <!-- MAIN: customer side (no longer the launcher) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
