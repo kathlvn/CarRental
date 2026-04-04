@@ -12,7 +12,18 @@
     <fragment
         android:id="@+id/myRentalsFragment"
         android:name="com.mobcom.carrental.MyRentalsFragment"
-        android:label="My Rentals" />
+        android:label="My Rentals">
+
+        <action
+            android:id="@+id/action_myRentals_to_rentalDetail"
+            app:destination="@id/rentalDetailFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/rentalDetailFragment"
+        android:name="com.mobcom.carrental.RentalDetailFragment"
+        android:label="Rental Detail" />
 
     <fragment
         android:id="@+id/messagesFragment"
@@ -28,5 +39,4 @@
         android:id="@+id/carDetailFragment"
         android:name="com.mobcom.carrental.CarDetailFragment"
         android:label="Car Detail" />
-
 </navigation>
