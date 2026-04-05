@@ -77,9 +77,25 @@ public class CarDetailFragment extends Fragment {
 
         // Book Now (placeholder for now)
         view.findViewById(R.id.btnBookNow).setOnClickListener(v -> {
-            // Will implement booking flow later
+            // Check if guest
+            com.mobcom.carrental.utils.SessionManager session =
+                    new com.mobcom.carrental.utils.SessionManager(requireContext());
+
+            if (session.isGuest()) {
+                // TODO: show guest login wall bottom sheet
+                return;
+            }
+
+            Bundle args = new Bundle();
+            args.putSerializable("car", car);
+            args.putString("startDate", selectedStartDate); // from your date picker
+            args.putString("endDate", selectedEndDate);
+            args.putInt("totalDays", totalDays);
+            androidx.navigation.Navigation.findNavController(requireView())
+                    .navigate(R.id.action_carDetail_to_bookingForm, args);
         });
 
         return view;
     }
+
 }

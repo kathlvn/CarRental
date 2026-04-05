@@ -24,4 +24,25 @@
         android:name="com.mobcom.carrental.provider.ProviderProfileFragment"
         android:label="Profile" />
 
+    <fragment
+        android:id="@+id/providerMyCarsFragment"
+        android:name="com.mobcom.carrental.provider.ProviderMyCarsFragment"
+        android:label="My Cars">
+
+        <action
+            android:id="@+id/action_myCars_to_addEditCar"
+            app:destination="@id/addEditCarFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditCarFragment"
+        android:name="com.mobcom.carrental.provider.AddEditCarFragment"
+        android:label="Add Car">
+
+        <argument
+            android:name="car"
+            app:argType="com.mobcom.carrental.models.ProviderCar"
+            app:nullable="true" />
+    </fragment>
+
 </navigation>
