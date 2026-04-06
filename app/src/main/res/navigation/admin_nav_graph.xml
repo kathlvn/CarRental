@@ -12,7 +12,13 @@
     <fragment
         android:id="@+id/adminListingsFragment"
         android:name="com.mobcom.carrental.admin.AdminListingsFragment"
-        android:label="Listings" />
+        android:label="Listings">
+
+        <action
+            android:id="@+id/action_listings_to_providerDetail"
+            app:destination="@id/adminProviderDetailFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/adminProvidersFragment"
