@@ -23,7 +23,13 @@
     <fragment
         android:id="@+id/adminProvidersFragment"
         android:name="com.mobcom.carrental.admin.AdminProvidersFragment"
-        android:label="Providers" />
+        android:label="Providers">
+
+        <action
+            android:id="@+id/action_providers_to_providerDetail"
+            app:destination="@id/adminProviderDetailFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/adminReportsFragment"
@@ -34,9 +40,11 @@
         android:id="@+id/adminProviderDetailFragment"
         android:name="com.mobcom.carrental.admin.AdminProviderDetailFragment"
         android:label="Provider Detail">
+
         <argument
-            android:name="providerId"
-            app:argType="string" />
+            android:name="provider"
+            app:argType="com.mobcom.carrental.models.AdminProvider" />
+
     </fragment>
 
 </navigation>
