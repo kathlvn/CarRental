@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/admin_nav_graph"
+    app:startDestination="@id/adminDashboardFragment">
+
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.mobcom.carrental.admin.AdminDashboardFragment"
+        android:label="Dashboard" />
+
+    <fragment
+        android:id="@+id/adminListingsFragment"
+        android:name="com.mobcom.carrental.admin.AdminListingsFragment"
+        android:label="Listings" />
+
+    <fragment
+        android:id="@+id/adminProvidersFragment"
+        android:name="com.mobcom.carrental.admin.AdminProvidersFragment"
+        android:label="Providers" />
+
+    <fragment
+        android:id="@+id/adminReportsFragment"
+        android:name="com.mobcom.carrental.admin.AdminReportsFragment"
+        android:label="Reports" />
+
+    <fragment
+        android:id="@+id/adminProviderDetailFragment"
+        android:name="com.mobcom.carrental.admin.AdminProviderDetailFragment"
+        android:label="Provider Detail">
+        <argument
+            android:name="providerId"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

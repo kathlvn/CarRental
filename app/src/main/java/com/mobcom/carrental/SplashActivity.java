@@ -44,8 +44,7 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ProviderMainActivity.class));
                 break;
             case SessionManager.ROLE_ADMIN:
-                // TODO: startActivity(new Intent(this, AdminMainActivity.class));
-                goToCustomer(); // temporary fallback
+                startActivity(new Intent(this, AdminMainActivity.class));
                 break;
             default:
                 goToCustomer();

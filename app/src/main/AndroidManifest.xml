@@ -16,7 +16,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CarRental" >
 
-        <!-- SPLASH: now the launcher entry point -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -27,7 +26,6 @@
             </intent-filter>
         </activity>
 
-        <!-- WELCOME: guest/login/register choice screen -->
         <activity android:name=".WelcomeActivity" />
 
         <!-- LOGIN: will be built next -->
@@ -38,6 +36,8 @@
             android:exported="false" />
 
         <activity android:name=".ProviderMainActivity" />
+
+        <activity android:name=".AdminMainActivity" />
 
     </application>
 
