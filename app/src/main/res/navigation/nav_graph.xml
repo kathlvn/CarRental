@@ -7,7 +7,13 @@
     <fragment
         android:id="@+id/exploreFragment"
         android:name="com.mobcom.carrental.ExploreFragment"
-        android:label="Explore" />
+        android:label="Explore" >
+
+        <action
+            android:id="@+id/action_explore_to_carDetail"
+            app:destination="@id/carDetailFragment" />
+
+    </fragment>
 
     <fragment
         android:id="@+id/myRentalsFragment"
@@ -39,4 +45,48 @@
         android:id="@+id/carDetailFragment"
         android:name="com.mobcom.carrental.CarDetailFragment"
         android:label="Car Detail" />
+
+    <action
+        android:id="@+id/action_carDetail_to_bookingForm"
+        app:destination="@id/bookingFormFragment" />
+
+    <fragment
+        android:id="@+id/bookingFormFragment"
+        android:name="com.mobcom.carrental.BookingFormFragment"
+        android:label="Book Car">
+
+        <argument
+            android:name="car"
+            app:argType="com.mobcom.carrental.Car" />
+
+        <argument
+            android:name="startDate"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="endDate"
+            app:argType="string"
+            android:defaultValue="" />
+
+        <argument
+            android:name="totalDays"
+            app:argType="integer"
+            android:defaultValue="1" />
+
+        <action
+            android:id="@+id/action_bookingForm_to_bookingConfirmation"
+            app:destination="@id/bookingConfirmationFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bookingConfirmationFragment"
+        android:name="com.mobcom.carrental.BookingConfirmationFragment"
+        android:label="Booking Confirmed">
+
+        <argument
+            android:name="booking"
+            app:argType="com.mobcom.carrental.models.Booking" />
+    </fragment>
+
 </navigation>

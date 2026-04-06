@@ -9,7 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import java.util.Calendar;
+import com.mobcom.carrental.utils.SessionManager;
 
 public class CarDetailFragment extends Fragment {
 
@@ -18,7 +18,8 @@ public class CarDetailFragment extends Fragment {
     private String endDate;
     private int rentalDays;
 
-    public static CarDetailFragment newInstance(Car car, String startDate, String endDate, int rentalDays) {
+    public static CarDetailFragment newInstance(Car car, String startDate,
+                                                String endDate, int rentalDays) {
         CarDetailFragment fragment = new CarDetailFragment();
         Bundle args = new Bundle();
         args.putString("carName", car.getName());
@@ -28,6 +29,14 @@ public class CarDetailFragment extends Fragment {
         args.putDouble("pricePerDay", car.getPricePerDay());
         args.putFloat("distanceKm", car.getDistanceKm());
         args.putInt("imageResId", car.getImageResId());
+        args.putString("imageUrl", car.getImageUrl());
+        args.putString("location", car.getLocation());
+        args.putString("providerName", car.getProviderName());
+        args.putString("providerId", car.getProviderId());
+        args.putString("plateNumber", car.getPlateNumber());
+        args.putString("carType", car.getCarType());
+        args.putFloat("rating", car.getRating());
+        args.putString("carId", car.getId());
         args.putString("startDate", startDate);
         args.putString("endDate", endDate);
         args.putInt("rentalDays", rentalDays);
@@ -37,65 +46,87 @@ public class CarDetailFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_car_detail, container, false);
 
-        // Get arguments
         Bundle args = getArguments();
         if (args == null) return view;
 
-        String carName = args.getString("carName");
-        String transmission = args.getString("transmission");
-        int seats = args.getInt("seats");
-        String fuelType = args.getString("fuelType");
-        double pricePerDay = args.getDouble("pricePerDay");
-        float distanceKm = args.getFloat("distanceKm");
-        int imageResId = args.getInt("imageResId");
-        String startDate = args.getString("startDate");
-        String endDate = args.getString("endDate");
-        int days = args.getInt("rentalDays", 1);
+        // Rebuild Car object from arguments
+        car = new Car(
+                args.getString("carId", ""),
+                args.getString("carName", ""),
+                args.getString("transmission", ""),
+                args.getInt("seats", 0),
+                args.getString("fuelType", ""),
+                args.getDouble("pricePerDay", 0),
+                args.getFloat("distanceKm", 0),
+                args.getInt("imageResId", 0),
+                args.getString("imageUrl", ""),
+                args.getString("location", ""),
+                args.getString("providerName", ""),
+                args.getString("providerId", ""),
+                args.getString("plateNumber", ""),
+                args.getString("carType", ""),
+                args.getFloat("rating", 0f)
+        );
+
+        startDate  = args.getString("startDate", "");
+        endDate    = args.getString("endDate", "");
+        rentalDays = args.getInt("rentalDays", 1);
 
         // Bind views
-        ((ImageView) view.findViewById(R.id.ivCarDetailImage)).setImageResource(imageResId);
-        ((TextView) view.findViewById(R.id.tvDetailCarName)).setText(carName);
-        ((TextView) view.findViewById(R.id.tvDetailPrice)).setText("₱" + (int) pricePerDay + "/Day");
-        ((TextView) view.findViewById(R.id.tvDetailDistance)).setText(distanceKm + " KM Away");
-        ((TextView) view.findViewById(R.id.tvDetailTransmission)).setText(transmission);
-        ((TextView) view.findViewById(R.id.tvDetailSeats)).setText(seats + " Seats");
-        ((TextView) view.findViewById(R.id.tvDetailFuel)).setText(fuelType);
-        ((TextView) view.findViewById(R.id.tvDetailRating)).setText("★ 4.8");
+        ((ImageView) view.findViewById(R.id.ivCarDetailImage))
+                .setImageResource(car.getImageResId());
+        ((TextView) view.findViewById(R.id.tvDetailCarName))
+                .setText(car.getName());
+        ((TextView) view.findViewById(R.id.tvDetailPrice))
+                .setText("₱" + (int) car.getPricePerDay() + "/Day");
+        ((TextView) view.findViewById(R.id.tvDetailDistance))
+                .setText(car.getDistanceKm() + " KM Away");
+        ((TextView) view.findViewById(R.id.tvDetailTransmission))
+                .setText(car.getTransmission());
+        ((TextView) view.findViewById(R.id.tvDetailSeats))
+                .setText(car.getSeats() + " Seats");
+        ((TextView) view.findViewById(R.id.tvDetailFuel))
+                .setText(car.getFuelType());
+        ((TextView) view.findViewById(R.id.tvDetailRating))
+                .setText("★ " + (car.getRating() > 0 ? car.getRating() : "4.8"));
 
         // Booking summary
-        ((TextView) view.findViewById(R.id.tvRentalPeriod)).setText(days + " day" + (days > 1 ? "s" : ""));
-        ((TextView) view.findViewById(R.id.tvPricePerDay)).setText("₱" + String.format("%,.0f", pricePerDay));
-        double total = pricePerDay * days;
-        ((TextView) view.findViewById(R.id.tvTotalPrice)).setText("₱" + String.format("%,.0f", total));
+        ((TextView) view.findViewById(R.id.tvRentalPeriod))
+                .setText(rentalDays + " day" + (rentalDays > 1 ? "s" : ""));
+        ((TextView) view.findViewById(R.id.tvPricePerDay))
+                .setText("₱" + String.format("%,.0f", car.getPricePerDay()));
+        double total = car.getPricePerDay() * rentalDays;
+        ((TextView) view.findViewById(R.id.tvTotalPrice))
+                .setText("₱" + String.format("%,.0f", total));
 
-        // Back button
         view.findViewById(R.id.btnBack).setOnClickListener(v ->
-                requireActivity().getSupportFragmentManager().popBackStack());
+                androidx.navigation.fragment.NavHostFragment
+                        .findNavController(CarDetailFragment.this)
+                        .popBackStack());
 
-        // Book Now (placeholder for now)
         view.findViewById(R.id.btnBookNow).setOnClickListener(v -> {
-            // Check if guest
-            com.mobcom.carrental.utils.SessionManager session =
-                    new com.mobcom.carrental.utils.SessionManager(requireContext());
+            SessionManager session = new SessionManager(requireContext());
 
             if (session.isGuest()) {
                 // TODO: show guest login wall bottom sheet
                 return;
             }
 
-            Bundle args = new Bundle();
-            args.putSerializable("car", car);
-            args.putString("startDate", selectedStartDate); // from your date picker
-            args.putString("endDate", selectedEndDate);
-            args.putInt("totalDays", totalDays);
-            androidx.navigation.Navigation.findNavController(requireView())
-                    .navigate(R.id.action_carDetail_to_bookingForm, args);
+            Bundle bookingArgs = new Bundle();
+            bookingArgs.putSerializable("car", car);
+            bookingArgs.putString("startDate", startDate);
+            bookingArgs.putString("endDate", endDate);
+            bookingArgs.putInt("totalDays", rentalDays);
+            androidx.navigation.fragment.NavHostFragment
+                    .findNavController(CarDetailFragment.this)
+                    .navigate(R.id.action_carDetail_to_bookingForm, bookingArgs);
         });
 
         return view;
     }
-
 }

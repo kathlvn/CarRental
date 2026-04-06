@@ -16,7 +16,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.models.Booking;
-import com.mobcom.carrental.models.Car;
+import com.mobcom.carrental.Car;
 import java.util.UUID;
 
 public class BookingFormFragment extends Fragment {

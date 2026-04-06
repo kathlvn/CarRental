@@ -36,7 +36,19 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
         holder.tvSeats.setText(car.getSeats() + " Seats");
         holder.tvFuel.setText(car.getFuelType());
         holder.tvPrice.setText("₱" + (int) car.getPricePerDay() + "/Day");
-        holder.ivCarImage.setImageResource(car.getImageResId());
+        if (car.getImageUrl() != null && !car.getImageUrl().isEmpty()) {
+            com.bumptech.glide.Glide.with(context)
+                    .load(car.getImageUrl())
+                    .centerCrop()
+                    .placeholder(car.getImageResId() != 0
+                            ? car.getImageResId()
+                            : R.drawable.placeholder_car)
+                    .into(holder.ivCarImage);
+        } else {
+            holder.ivCarImage.setImageResource(car.getImageResId() != 0
+                    ? car.getImageResId()
+                    : R.drawable.placeholder_car);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onCarClick(car);

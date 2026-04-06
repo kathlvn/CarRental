@@ -10,12 +10,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -29,13 +29,15 @@ public class ExploreFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_explore, container, false);
 
-        tvLocation = view.findViewById(R.id.tvLocation);
+        tvLocation  = view.findViewById(R.id.tvLocation);
         tvStartDate = view.findViewById(R.id.tvStartDate);
-        tvEndDate = view.findViewById(R.id.tvEndDate);
-        dateRangeRow = view.findViewById(R.id.dateRangeRow);
+        tvEndDate   = view.findViewById(R.id.tvEndDate);
+        dateRangeRow= view.findViewById(R.id.dateRangeRow);
 
         // Set default dates (today and 4 days later)
         endCalendar.add(Calendar.DAY_OF_MONTH, 4);
@@ -47,17 +49,18 @@ public class ExploreFragment extends Fragment {
             dateRangeRow.setVisibility(isExpanded ? View.VISIBLE : View.GONE);
         });
 
-        // Tap location to open bottom sheet
+        // Location
         tvLocation.setOnClickListener(v -> openLocationSheet());
         view.findViewById(R.id.topBar).setOnClickListener(v -> openLocationSheet());
 
-        // Tap dates to open date picker
+        // Dates
         view.findViewById(R.id.btnStartDate).setOnClickListener(v -> showDatePicker(true));
         view.findViewById(R.id.btnEndDate).setOnClickListener(v -> showDatePicker(false));
 
+        // Filter
         view.findViewById(R.id.ivFilter).setOnClickListener(v -> openFilterSheet());
 
-        // Setup car sections
+        // Car sections
         setupCarSections(view);
 
         return view;
@@ -68,10 +71,9 @@ public class ExploreFragment extends Fragment {
 
         DatePickerDialog dialog = new DatePickerDialog(
                 requireContext(),
-                (view, year, month, dayOfMonth) -> {
+                (v, year, month, dayOfMonth) -> {
                     calendar.set(year, month, dayOfMonth);
 
-                    // If start date is after end date, push end date forward
                     if (isStartDate && startCalendar.after(endCalendar)) {
                         endCalendar = (Calendar) startCalendar.clone();
                         endCalendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -84,10 +86,7 @@ public class ExploreFragment extends Fragment {
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
 
-        // Prevent selecting past dates
         dialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
-
-        // If picking end date, can't be before start date
         if (!isStartDate) {
             dialog.getDatePicker().setMinDate(startCalendar.getTimeInMillis());
         }
@@ -107,57 +106,96 @@ public class ExploreFragment extends Fragment {
         sheet.show(getParentFragmentManager(), "LocationBottomSheet");
     }
 
-    private void setupCarSections(View view) {
-        List<Car> popularCars = getSampleCars();
-        List<Car> shortTripCars = getSampleCars();
-        List<Car> budgetCars = getSampleCars();
+    private void openFilterSheet() {
+        FilterBottomSheet sheet = new FilterBottomSheet();
+        sheet.setOnFiltersAppliedListener(options -> {
+            // TODO: apply filters to car lists
+        });
+        sheet.show(getParentFragmentManager(), "FilterBottomSheet");
+    }
 
-        setupRecyclerView(view, R.id.rvPopularCars, popularCars);
-        setupRecyclerView(view, R.id.rvShortTrips, shortTripCars);
-        setupRecyclerView(view, R.id.rvBudgetFriendly, budgetCars);
+    // ── Car Sections ──────────────────────────────────────────────────────────
+
+    private void setupCarSections(View view) {
+        setupRecyclerView(view, R.id.rvPopularCars, getSampleCars());
+        setupRecyclerView(view, R.id.rvShortTrips, getSampleCars());
+        setupRecyclerView(view, R.id.rvBudgetFriendly, getSampleCars());
     }
 
     private void setupRecyclerView(View view, int rvId, List<Car> cars) {
         RecyclerView rv = view.findViewById(rvId);
-        rv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        rv.setLayoutManager(new LinearLayoutManager(
+                getContext(), LinearLayoutManager.HORIZONTAL, false));
+
         CarAdapter adapter = new CarAdapter(getContext(), cars);
-        adapter.setOnCarClickListener(car -> {
-            // Calculate rental days
-            long diffMs = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
-            int days = (int) (diffMs / (1000 * 60 * 60 * 24));
-            if (days < 1) days = 1;
-
-            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-            CarDetailFragment detail = CarDetailFragment.newInstance(
-                    car,
-                    sdf.format(startCalendar.getTime()),
-                    sdf.format(endCalendar.getTime()),
-                    days
-            );
-
-            requireActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.nav_host_fragment, detail)
-                    .addToBackStack(null)
-                    .commit();
-        });
+        adapter.setOnCarClickListener(car -> navigateToCarDetail(car));
         rv.setAdapter(adapter);
     }
 
-    private List<Car> getSampleCars() {
-        List<Car> cars = new ArrayList<>();
-        cars.add(new Car("Tesla Model S 2024", "Automatic", 4, "Electricity", 3985, 1.2f, R.drawable.ic_rentals));
-        cars.add(new Car("Toyota Vios 2023", "Automatic", 5, "Gasoline", 1500, 2.1f, R.drawable.ic_rentals));
-        cars.add(new Car("Honda City 2024", "Automatic", 5, "Gasoline", 1800, 0.8f, R.drawable.ic_rentals));
-        cars.add(new Car("Mitsubishi Mirage", "Manual", 5, "Gasoline", 1200, 3.0f, R.drawable.ic_rentals));
-        return cars;
+    private void navigateToCarDetail(Car car) {
+        // Calculate rental days
+        long diffMs = endCalendar.getTimeInMillis() - startCalendar.getTimeInMillis();
+        int days = (int) (diffMs / (1000 * 60 * 60 * 24));
+        if (days < 1) days = 1;
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+
+        Bundle args = new Bundle();
+        args.putString("carId",        car.getId());
+        args.putString("carName",      car.getName());
+        args.putString("transmission", car.getTransmission());
+        args.putInt("seats",           car.getSeats());
+        args.putString("fuelType",     car.getFuelType());
+        args.putDouble("pricePerDay",  car.getPricePerDay());
+        args.putFloat("distanceKm",    car.getDistanceKm());
+        args.putInt("imageResId",      car.getImageResId());
+        args.putString("imageUrl",     car.getImageUrl());
+        args.putString("location",     car.getLocation());
+        args.putString("providerName", car.getProviderName());
+        args.putString("providerId",   car.getProviderId());
+        args.putString("plateNumber",  car.getPlateNumber());
+        args.putString("carType",      car.getCarType());
+        args.putFloat("rating",        car.getRating());
+        args.putString("startDate",    sdf.format(startCalendar.getTime()));
+        args.putString("endDate",      sdf.format(endCalendar.getTime()));
+        args.putInt("rentalDays",      days);
+
+        NavHostFragment.findNavController(ExploreFragment.this)
+                .navigate(R.id.action_explore_to_carDetail, args);
     }
 
-    private void openFilterSheet() {
-        FilterBottomSheet sheet = new FilterBottomSheet();
-        sheet.setOnFiltersAppliedListener(options -> {
-            // We'll use these filter options to filter car lists later
-        });
-        sheet.show(getParentFragmentManager(), "FilterBottomSheet");
+    // ── Sample Data ───────────────────────────────────────────────────────────
+
+    private List<Car> getSampleCars() {
+        List<Car> cars = new ArrayList<>();
+        cars.add(new Car(
+                "C001", "Toyota Vios 2023", "Automatic", 5,
+                "Gasoline", 1500, 2.1f, R.drawable.ic_rentals,
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
+                "Bacolod City", "Juan dela Cruz", "P001",
+                "ABC 1234", "Sedan", 4.8f));
+
+        cars.add(new Car(
+                "C002", "Honda City 2024", "Automatic", 5,
+                "Gasoline", 1800, 0.8f, R.drawable.ic_rentals,
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
+                "Bacolod City", "Maria Santos", "P002",
+                "XYZ 5678", "Sedan", 4.5f));
+
+        cars.add(new Car(
+                "C003", "Mitsubishi Xpander 2022", "Automatic", 7,
+                "Gasoline", 2000, 3.0f, R.drawable.ic_rentals,
+                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg/1280px-2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg",
+                "Bacolod City", "Pedro Reyes", "P003",
+                "DEF 9012", "Van", 4.2f));
+
+        cars.add(new Car(
+                "C004", "Mitsubishi Mirage 2022", "Manual", 5,
+                "Gasoline", 1200, 3.0f, R.drawable.ic_rentals,
+                "",
+                "Bacolod City", "Ana Reyes", "P004",
+                "GHI 3456", "Hatchback", 4.0f));
+
+        return cars;
     }
 }
