@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.mobcom.carrental.R;
+import com.mobcom.carrental.models.RentalReview;
 import com.mobcom.carrental.models.Rental;
+import com.mobcom.carrental.utils.ReviewStore;
 import java.util.List;
 
 public class RentalAdapter extends RecyclerView.Adapter<RentalAdapter.RentalViewHolder> {
@@ -22,6 +24,7 @@ public class RentalAdapter extends RecyclerView.Adapter<RentalAdapter.RentalView
         void onViewDetails(Rental rental);
         void onCancelRental(Rental rental);
         void onRebook(Rental rental);
+        void onRateReview(Rental rental);
     }
 
     private List<Rental> rentals;
@@ -67,6 +70,15 @@ public class RentalAdapter extends RecyclerView.Adapter<RentalAdapter.RentalView
                 holder.btnAction.setOnClickListener(v -> listener.onCancelRental(rental));
                 break;
             case COMPLETED:
+                RentalReview review = ReviewStore.getReview(rental.getRentalId());
+                if (review == null) {
+                    holder.btnAction.setText("Rate & Review");
+                    holder.btnAction.setOnClickListener(v -> listener.onRateReview(rental));
+                } else {
+                    holder.btnAction.setText("Rebook");
+                    holder.btnAction.setOnClickListener(v -> listener.onRebook(rental));
+                }
+                break;
             case CANCELLED:
                 holder.btnAction.setText("Rebook");
                 holder.btnAction.setOnClickListener(v -> listener.onRebook(rental));

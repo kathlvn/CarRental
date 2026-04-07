@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -92,11 +93,12 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
-        <LinearLayout
-            android:id="@+id/layoutTransmission"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupTransmission"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            app:singleSelection="true"
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.chip.Chip
@@ -122,7 +124,7 @@
                 android:text="Manual"
                 style="@style/Widget.Material3.Chip.Filter" />
 
-        </LinearLayout>
+        </com.google.android.material.chip.ChipGroup>
 
         <!-- 3. Number of Seats -->
         <TextView
@@ -137,6 +139,7 @@
             android:id="@+id/chipGroupSeats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:singleSelection="true"
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.chip.Chip
@@ -189,6 +192,7 @@
             android:id="@+id/chipGroupFuel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:singleSelection="true"
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.chip.Chip
@@ -241,6 +245,7 @@
             android:id="@+id/chipGroupCarType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:singleSelection="true"
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.chip.Chip
@@ -293,6 +298,7 @@
             android:id="@+id/chipGroupRating"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:singleSelection="true"
             android:layout_marginBottom="24dp">
 
             <com.google.android.material.chip.Chip

@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.mobcom.carrental.models.Rental;
+import com.mobcom.carrental.utils.NotificationStore;
 import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +26,9 @@ public class ProfileFragment extends Fragment {
 
     private TextView tvName, tvEmail, tvPhone;
     private TextView tvStatsTotal, tvStatsCompleted, tvStatsCancelled;
+    private TextView tvNotificationBadge;
     private CardView cardStatsTotal, cardStatsCompleted, cardStatsCancelled;
-    private LinearLayout layoutEditProfile, layoutChangePassword, layoutLogout;
+    private LinearLayout layoutEditProfile, layoutChangePassword, layoutLogout, layoutNotificationInbox;
     private SwitchMaterial switchNotifications;
 
     private SessionManager sessionManager;
@@ -70,6 +72,8 @@ public class ProfileFragment extends Fragment {
         layoutEditProfile = view.findViewById(R.id.layoutEditProfile);
         layoutChangePassword = view.findViewById(R.id.layoutChangePassword);
         layoutLogout = view.findViewById(R.id.layoutLogout);
+        layoutNotificationInbox = view.findViewById(R.id.layoutNotificationInbox);
+        tvNotificationBadge = view.findViewById(R.id.tvNotificationBadge);
         switchNotifications = view.findViewById(R.id.switchNotifications);
     }
 
@@ -137,6 +141,10 @@ public class ProfileFragment extends Fragment {
 
         layoutChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
+        layoutNotificationInbox.setOnClickListener(v ->
+            androidx.navigation.Navigation.findNavController(v)
+                .navigate(R.id.notificationsFragment));
+
         switchNotifications.setOnCheckedChangeListener((button, isChecked) -> {
             sessionManager.setNotificationsEnabledForRole(SessionManager.ROLE_CUSTOMER, isChecked);
             Toast.makeText(requireContext(),
@@ -151,6 +159,23 @@ public class ProfileFragment extends Fragment {
         switchNotifications.setChecked(
                 sessionManager.isNotificationsEnabledForRole(SessionManager.ROLE_CUSTOMER)
         );
+        updateNotificationBadge();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateNotificationBadge();
+    }
+
+    private void updateNotificationBadge() {
+        int unread = NotificationStore.getUnreadCount(requireContext(), SessionManager.ROLE_CUSTOMER);
+        if (unread > 0) {
+            tvNotificationBadge.setVisibility(View.VISIBLE);
+            tvNotificationBadge.setText(String.valueOf(unread));
+        } else {
+            tvNotificationBadge.setVisibility(View.GONE);
+        }
     }
 
     private void openMyRentalsTab(int tab) {

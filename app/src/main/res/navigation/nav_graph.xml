@@ -42,6 +42,11 @@
         android:label="Profile" />
 
     <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.mobcom.carrental.NotificationsFragment"
+        android:label="Notifications" />
+
+    <fragment
         android:id="@+id/carDetailFragment"
         android:name="com.mobcom.carrental.CarDetailFragment"
         android:label="Car Detail" />

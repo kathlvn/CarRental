@@ -18,6 +18,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.ProviderBookingAdapter;
 import com.mobcom.carrental.models.ProviderBooking;
+import com.mobcom.carrental.utils.NotificationStore;
+import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -189,6 +191,14 @@ public class ProviderBookingsFragment extends Fragment
                         + " for " + booking.getCarName()
                         + " (" + booking.getStartDate() + " → " + booking.getEndDate() + ")")
                 .setPositiveButton("Accept", (dialog, which) -> {
+                    NotificationStore.pushBookingStatusNotification(
+                        requireContext(),
+                        SessionManager.ROLE_CUSTOMER,
+                        booking.getBookingId(),
+                        "Booking confirmed",
+                        booking.getCarName() + " was accepted by the provider"
+                    );
+
                     booking.setStatus(ProviderBooking.Status.CONFIRMED);
                     filterAndShow(currentTab);
                     Toast.makeText(requireContext(), "Booking accepted", Toast.LENGTH_SHORT).show();
@@ -211,6 +221,14 @@ public class ProviderBookingsFragment extends Fragment
                 .setTitle("Reject Booking")
                 .setMessage("Select a reason for rejection:")
                 .setItems(reasons, (dialog, which) -> {
+                    NotificationStore.pushBookingStatusNotification(
+                            requireContext(),
+                            SessionManager.ROLE_CUSTOMER,
+                            booking.getBookingId(),
+                            "Booking rejected",
+                            booking.getCarName() + " was rejected: " + reasons[which]
+                    );
+
                     booking.setStatus(ProviderBooking.Status.REJECTED);
                     filterAndShow(currentTab);
                     Toast.makeText(requireContext(),

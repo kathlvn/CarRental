@@ -19,6 +19,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.WelcomeActivity;
+import com.mobcom.carrental.utils.NotificationStore;
 import com.mobcom.carrental.utils.SessionManager;
 
 public class ProviderProfileFragment extends Fragment {
@@ -43,6 +44,8 @@ public class ProviderProfileFragment extends Fragment {
 
     // Views — Settings
     private LinearLayout layoutEditProfile, layoutChangePassword, layoutLogout;
+    private LinearLayout layoutNotificationInbox;
+    private TextView tvNotificationBadge;
     private SwitchMaterial switchNotifications;
 
     // Dummy data — replace with real API later
@@ -94,7 +97,9 @@ public class ProviderProfileFragment extends Fragment {
         layoutAddCar         = view.findViewById(R.id.layoutAddCar);
         layoutEditProfile    = view.findViewById(R.id.layoutEditProfile);
         layoutChangePassword = view.findViewById(R.id.layoutChangePassword);
+        layoutNotificationInbox = view.findViewById(R.id.layoutNotificationInbox);
         layoutLogout         = view.findViewById(R.id.layoutLogout);
+        tvNotificationBadge  = view.findViewById(R.id.tvNotificationBadge);
         switchNotifications  = view.findViewById(R.id.switchNotifications);
     }
 
@@ -243,6 +248,10 @@ public class ProviderProfileFragment extends Fragment {
                     Toast.LENGTH_SHORT).show();
         });
 
+        layoutNotificationInbox.setOnClickListener(v ->
+            androidx.navigation.Navigation.findNavController(v)
+                .navigate(R.id.notificationsFragment));
+
         layoutLogout.setOnClickListener(v -> showLogoutDialog());
     }
 
@@ -250,6 +259,23 @@ public class ProviderProfileFragment extends Fragment {
         switchNotifications.setChecked(
                 sessionManager.isNotificationsEnabledForRole(SessionManager.ROLE_PROVIDER)
         );
+        updateNotificationBadge();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateNotificationBadge();
+    }
+
+    private void updateNotificationBadge() {
+        int unread = NotificationStore.getUnreadCount(requireContext(), SessionManager.ROLE_PROVIDER);
+        if (unread > 0) {
+            tvNotificationBadge.setVisibility(View.VISIBLE);
+            tvNotificationBadge.setText(String.valueOf(unread));
+        } else {
+            tvNotificationBadge.setVisibility(View.GONE);
+        }
     }
 
     private void showEditProfileDialog() {

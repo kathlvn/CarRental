@@ -32,6 +32,7 @@ public class ExploreFragment extends Fragment {
     private CarAdapter popularAdapter;
     private CarAdapter shortTripAdapter;
     private CarAdapter budgetAdapter;
+    private FilterBottomSheet.FilterOptions activeFilters = new FilterBottomSheet.FilterOptions();
 
     @Nullable
     @Override
@@ -122,14 +123,16 @@ public class ExploreFragment extends Fragment {
 
     private void openFilterSheet() {
         FilterBottomSheet sheet = new FilterBottomSheet();
+        sheet.setCurrentOptions(activeFilters);
         sheet.setOnFiltersAppliedListener(this::applyFilters);
         sheet.show(getParentFragmentManager(), "FilterBottomSheet");
     }
 
     private void applyFilters(FilterBottomSheet.FilterOptions options) {
-        popularAdapter.updateList(filterCars(allPopularCars, options));
-        shortTripAdapter.updateList(filterCars(allShortTripCars, options));
-        budgetAdapter.updateList(filterCars(allBudgetCars, options));
+        activeFilters = options != null ? options.copy() : new FilterBottomSheet.FilterOptions();
+        popularAdapter.updateList(filterCars(allPopularCars, activeFilters));
+        shortTripAdapter.updateList(filterCars(allShortTripCars, activeFilters));
+        budgetAdapter.updateList(filterCars(allBudgetCars, activeFilters));
     }
 
     private List<Car> filterCars(List<Car> source, FilterBottomSheet.FilterOptions options) {
@@ -175,6 +178,8 @@ public class ExploreFragment extends Fragment {
         popularAdapter = setupRecyclerView(view, R.id.rvPopularCars, allPopularCars);
         shortTripAdapter = setupRecyclerView(view, R.id.rvShortTrips, allShortTripCars);
         budgetAdapter = setupRecyclerView(view, R.id.rvBudgetFriendly, allBudgetCars);
+
+        applyFilters(activeFilters);
     }
 
     private CarAdapter setupRecyclerView(View view, int rvId, List<Car> cars) {

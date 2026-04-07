@@ -19,6 +19,11 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.models.Rental;
+import com.mobcom.carrental.models.RentalReview;
+import com.mobcom.carrental.utils.BookingApiClient;
+import com.mobcom.carrental.utils.NotificationStore;
+import com.mobcom.carrental.utils.ReviewStore;
+import com.mobcom.carrental.utils.SessionManager;
 
 public class RentalDetailFragment extends Fragment {
 
@@ -200,13 +205,27 @@ public class RentalDetailFragment extends Fragment {
                 });
                 break;
             case COMPLETED:
-                btnPrimary.setText("Rebook");
-                btnPrimary.setOnClickListener(v -> {
-                    Bundle args = new Bundle();
-                    args.putString("prefillLocation", rental.getPickupLocation());
-                    androidx.navigation.Navigation.findNavController(v)
-                            .navigate(R.id.exploreFragment, args);
-                });
+                RentalReview existingReview = ReviewStore.getReview(rental.getRentalId());
+                if (existingReview == null) {
+                    btnPrimary.setText("Rate & Review");
+                    btnPrimary.setOnClickListener(v -> ReviewDialogHelper.show(
+                            requireContext(),
+                            rental.getCarName(),
+                            review -> {
+                                ReviewStore.saveReview(rental.getRentalId(), review);
+                                Toast.makeText(requireContext(), "Thanks for your review!", Toast.LENGTH_SHORT).show();
+                                setupActionButtons();
+                            }
+                    ));
+                } else {
+                    btnPrimary.setText("Rebook");
+                    btnPrimary.setOnClickListener(v -> {
+                        Bundle args = new Bundle();
+                        args.putString("prefillLocation", rental.getPickupLocation());
+                        androidx.navigation.Navigation.findNavController(v)
+                                .navigate(R.id.exploreFragment, args);
+                    });
+                }
                 break;
             case CANCELLED:
                 btnPrimary.setVisibility(View.GONE);
@@ -220,23 +239,54 @@ public class RentalDetailFragment extends Fragment {
                 .setMessage("Are you sure you want to cancel booking #"
                         + rental.getRentalId() + "? This action cannot be undone.")
                 .setPositiveButton("Yes, Cancel", (dialog, which) -> {
-                rental = new Rental(
-                    rental.getRentalId(),
-                    rental.getCarName(),
-                    rental.getCarImageUrl(),
-                    rental.getCarPlate(),
-                    rental.getPickupLocation(),
-                    rental.getStartDate(),
-                    rental.getEndDate(),
-                    rental.getTotalDays(),
-                    rental.getTotalPrice(),
-                    Rental.Status.CANCELLED,
-                    rental.getProviderName()
-                );
-                populateData();
-                setupStatusTracker();
-                setupActionButtons();
-                Toast.makeText(requireContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
+                String originalText = btnPrimary.getText().toString();
+                btnPrimary.setEnabled(false);
+                btnPrimary.setText("Cancelling...");
+
+                BookingApiClient.cancelBooking(rental.getRentalId(), new BookingApiClient.CancelBookingCallback() {
+                    @Override
+                    public void onSuccess() {
+                        if (!isAdded()) return;
+                        requireActivity().runOnUiThread(() -> {
+                            NotificationStore.pushBookingStatusNotification(
+                                requireContext(),
+                                SessionManager.ROLE_PROVIDER,
+                                rental.getRentalId(),
+                                "Booking cancelled by customer",
+                                rental.getCarName() + " was cancelled for "
+                                    + rental.getStartDate() + " to " + rental.getEndDate()
+                            );
+
+                            rental = new Rental(
+                                rental.getRentalId(),
+                                rental.getCarName(),
+                                rental.getCarImageUrl(),
+                                rental.getCarPlate(),
+                                rental.getPickupLocation(),
+                                rental.getStartDate(),
+                                rental.getEndDate(),
+                                rental.getTotalDays(),
+                                rental.getTotalPrice(),
+                                Rental.Status.CANCELLED,
+                                rental.getProviderName()
+                            );
+                            populateData();
+                            setupStatusTracker();
+                            setupActionButtons();
+                            Toast.makeText(requireContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+
+                    @Override
+                    public void onError(@NonNull String message) {
+                        if (!isAdded()) return;
+                        requireActivity().runOnUiThread(() -> {
+                            btnPrimary.setEnabled(true);
+                            btnPrimary.setText(originalText);
+                            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                });
                 })
                 .setNegativeButton("Keep Booking", null)
                 .show();

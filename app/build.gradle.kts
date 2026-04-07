@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+val bookingsApiBaseUrl = (project.findProperty("BOOKINGS_API_BASE_URL") as String?) ?: ""
+
 android {
     namespace = "com.mobcom.carrental"
     compileSdk {
@@ -17,6 +19,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        buildConfigField("String", "BOOKINGS_API_BASE_URL", "\"$bookingsApiBaseUrl\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -28,6 +32,9 @@ android {
                 "proguard-rules.pro"
             )
         }
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

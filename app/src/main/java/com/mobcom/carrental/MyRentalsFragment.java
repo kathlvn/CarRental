@@ -18,6 +18,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.RentalAdapter;
 import com.mobcom.carrental.models.Rental;
+import com.mobcom.carrental.models.RentalReview;
+import com.mobcom.carrental.utils.NotificationStore;
+import com.mobcom.carrental.utils.ReviewStore;
+import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -191,6 +195,15 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
                 .setTitle("Cancel Booking")
                 .setMessage("Are you sure you want to cancel booking #" + rental.getRentalId() + "?")
                 .setPositiveButton("Yes, Cancel", (dialog, which) -> {
+                    NotificationStore.pushBookingStatusNotification(
+                        requireContext(),
+                        SessionManager.ROLE_PROVIDER,
+                        rental.getRentalId(),
+                        "Booking cancelled by customer",
+                        rental.getCarName() + " was cancelled for "
+                            + rental.getStartDate() + " to " + rental.getEndDate()
+                    );
+
                     allRentals.remove(rental);
                     allRentals.add(new Rental(
                             rental.getRentalId(),
@@ -218,5 +231,21 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
         args.putString("prefillLocation", rental.getPickupLocation());
         androidx.navigation.Navigation.findNavController(requireView())
                 .navigate(R.id.exploreFragment, args);
+    }
+
+    @Override
+    public void onRateReview(Rental rental) {
+        RentalReview existing = ReviewStore.getReview(rental.getRentalId());
+        if (existing != null) {
+            Toast.makeText(requireContext(), "You already reviewed this rental", Toast.LENGTH_SHORT).show();
+            filterAndShow(currentTab);
+            return;
+        }
+
+        ReviewDialogHelper.show(requireContext(), rental.getCarName(), review -> {
+            ReviewStore.saveReview(rental.getRentalId(), review);
+            Toast.makeText(requireContext(), "Thanks for your review!", Toast.LENGTH_SHORT).show();
+            filterAndShow(currentTab);
+        });
     }
 }
