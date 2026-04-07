@@ -1,4 +1,4 @@
-package com.mobcom.carrental.provider;
+package com.mobcom.carrental.fragments.provider;
 
 import android.app.Activity;
 import android.content.Intent;

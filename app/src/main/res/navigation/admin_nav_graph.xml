@@ -6,12 +6,12 @@
 
     <fragment
         android:id="@+id/adminDashboardFragment"
-        android:name="com.mobcom.carrental.admin.AdminDashboardFragment"
+        android:name="com.mobcom.carrental.fragments.admin.AdminDashboardFragment"
         android:label="Dashboard" />
 
     <fragment
         android:id="@+id/adminListingsFragment"
-        android:name="com.mobcom.carrental.admin.AdminListingsFragment"
+        android:name="com.mobcom.carrental.fragments.admin.AdminListingsFragment"
         android:label="Listings">
 
         <action
@@ -22,7 +22,7 @@
 
     <fragment
         android:id="@+id/adminProvidersFragment"
-        android:name="com.mobcom.carrental.admin.AdminProvidersFragment"
+        android:name="com.mobcom.carrental.fragments.admin.AdminProvidersFragment"
         android:label="Providers">
 
         <action
@@ -33,12 +33,12 @@
 
     <fragment
         android:id="@+id/adminReportsFragment"
-        android:name="com.mobcom.carrental.admin.AdminReportsFragment"
+        android:name="com.mobcom.carrental.fragments.admin.AdminReportsFragment"
         android:label="Reports" />
 
     <fragment
         android:id="@+id/adminProviderDetailFragment"
-        android:name="com.mobcom.carrental.admin.AdminProviderDetailFragment"
+        android:name="com.mobcom.carrental.fragments.admin.AdminProviderDetailFragment"
         android:label="Provider Detail">
 
         <argument

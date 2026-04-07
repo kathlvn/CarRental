@@ -6,27 +6,27 @@
 
     <fragment
         android:id="@+id/providerDashboardFragment"
-        android:name="com.mobcom.carrental.provider.ProviderDashboardFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderDashboardFragment"
         android:label="Dashboard" />
 
     <fragment
         android:id="@+id/providerMyCarsFragment"
-        android:name="com.mobcom.carrental.provider.ProviderMyCarsFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderMyCarsFragment"
         android:label="My Cars" />
 
     <fragment
         android:id="@+id/providerBookingsFragment"
-        android:name="com.mobcom.carrental.provider.ProviderBookingsFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderBookingsFragment"
         android:label="Bookings" />
 
     <fragment
         android:id="@+id/providerProfileFragment"
-        android:name="com.mobcom.carrental.provider.ProviderProfileFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderProfileFragment"
         android:label="Profile" />
 
     <fragment
         android:id="@+id/providerMyCarsFragment"
-        android:name="com.mobcom.carrental.provider.ProviderMyCarsFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderMyCarsFragment"
         android:label="My Cars">
 
         <action
@@ -36,7 +36,7 @@
 
     <fragment
         android:id="@+id/addEditCarFragment"
-        android:name="com.mobcom.carrental.provider.AddEditCarFragment"
+        android:name="com.mobcom.carrental.fragments.provider.AddEditCarFragment"
         android:label="Add Car">
 
         <argument

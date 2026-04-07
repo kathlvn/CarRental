@@ -1,4 +1,4 @@
-package com.mobcom.carrental.admin;
+package com.mobcom.carrental.fragments.admin;
 
 import android.graphics.Color;
 import android.os.Bundle;

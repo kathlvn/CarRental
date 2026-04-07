@@ -1,4 +1,4 @@
-package com.mobcom.carrental.admin;
+package com.mobcom.carrental.fragments.admin;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
