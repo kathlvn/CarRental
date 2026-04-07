@@ -1,4 +1,4 @@
-package com.mobcom.carrental.fragments.provider;
++package com.mobcom.carrental.fragments.provider;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

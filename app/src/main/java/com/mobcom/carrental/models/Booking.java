@@ -70,4 +70,8 @@ public class Booking implements Serializable {
     public PaymentMethod getPaymentMethod() { return paymentMethod; }
     public Rental.Status getStatus()      { return status; }
     public String getCreatedAt()          { return createdAt; }
+
+    // Setters
+    public void setStatus(Rental.Status status)    { this.status = status; }
+    public void setCreatedAt(String createdAt)     { this.createdAt = createdAt; }
 }
