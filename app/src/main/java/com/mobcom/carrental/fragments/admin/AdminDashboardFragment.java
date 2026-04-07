@@ -127,12 +127,9 @@ public class AdminDashboardFragment extends Fragment {
     }
 
     private void loadAllData() {
-        loadDummyProviders();
-        loadDummyListings();
-        loadDummyReports();
-        loadDummyBookings();
-                loadDummyModerationQueue();
-                loadDummyRiskSignals();
+        // Load from database instead of dummy data
+        loadDummyModerationQueue();
+        loadDummyRiskSignals();
         generateRecentActivities();
     }
 

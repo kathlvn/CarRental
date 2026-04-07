@@ -59,7 +59,7 @@ public class ProviderDashboardFragment extends Fragment
         bindViews(view);
         setupGreeting();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
         updateStats();
         updatePendingList();
         buildCalendar();

@@ -1,5 +1,6 @@
 package com.mobcom.carrental;
 
+import com.mobcom.carrental.database.DatabaseInitializer;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
@@ -13,6 +14,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DatabaseInitializer.initializeDatabase(this);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);

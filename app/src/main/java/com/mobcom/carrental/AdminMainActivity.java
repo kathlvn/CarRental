@@ -10,6 +10,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.DatabaseInitializer;
 
 public class AdminMainActivity extends AppCompatActivity {
 
@@ -20,6 +21,8 @@ public class AdminMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
+
+        DatabaseInitializer.initializeDatabase(this);
 
         sessionManager = new SessionManager(this);
 

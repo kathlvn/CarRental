@@ -94,6 +94,8 @@ public class CarDetailFragment extends Fragment {
                 .setText(car.getFuelType());
         ((TextView) view.findViewById(R.id.tvDetailRating))
                 .setText("★ " + (car.getRating() > 0 ? car.getRating() : "4.8"));
+        ((TextView) view.findViewById(R.id.tvProviderName))
+                .setText(car.getProviderName());
 
         // Booking summary
         ((TextView) view.findViewById(R.id.tvRentalPeriod))

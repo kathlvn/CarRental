@@ -13,7 +13,8 @@
         android:background="#1A237E"
         android:theme="@style/ThemeOverlay.MaterialComponents.ActionBar"
         app:title="Messages"
-        app:titleTextColor="@android:color/white" />
+        app:titleTextColor="@android:color/white"
+        app:navigationIcon="@drawable/ic_explore" />
 
     <TextView
         android:id="@+id/tvThreadInfo"

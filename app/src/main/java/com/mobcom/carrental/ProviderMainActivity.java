@@ -7,6 +7,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.mobcom.carrental.database.DatabaseInitializer;
 
 public class ProviderMainActivity extends AppCompatActivity {
 
@@ -14,6 +15,8 @@ public class ProviderMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_provider_main);
+
+        DatabaseInitializer.initializeDatabase(this);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.provider_nav_host_fragment);

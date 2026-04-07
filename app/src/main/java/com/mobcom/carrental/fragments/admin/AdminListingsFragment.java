@@ -59,7 +59,7 @@ public class AdminListingsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
         filterAndShow();
         updatePendingBadge();
         setupRiskFilter();

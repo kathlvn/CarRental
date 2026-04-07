@@ -53,7 +53,7 @@ public class AdminReportsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
         filterAndShow();
         updateOpenBadge();
     }

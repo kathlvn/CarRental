@@ -50,7 +50,7 @@ public class AdminProvidersFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
         filterAndShow();
     }
 

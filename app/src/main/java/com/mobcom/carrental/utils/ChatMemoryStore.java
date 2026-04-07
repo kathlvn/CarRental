@@ -50,4 +50,16 @@ public final class ChatMemoryStore {
         }
         return null;
     }
+
+    public static synchronized List<String> getAllThreadIds() {
+        return new ArrayList<>(THREADS.keySet());
+    }
+
+    public static synchronized ChatMessage getLastMessage(String threadId) {
+        List<ChatMessage> messages = THREADS.get(threadId);
+        if (messages == null || messages.isEmpty()) {
+            return null;
+        }
+        return messages.get(messages.size() - 1);
+    }
 }

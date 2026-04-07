@@ -58,7 +58,7 @@ public class ProviderBookingsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
         filterAndShow(0);
         btnOpenMessages.setOnClickListener(v ->
             androidx.navigation.Navigation.findNavController(v)

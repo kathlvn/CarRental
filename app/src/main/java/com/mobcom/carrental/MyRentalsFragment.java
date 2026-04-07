@@ -59,7 +59,7 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        // loadDummyData(); // Load from database instead
 
         int initialTab = 0;
         Bundle args = getArguments();

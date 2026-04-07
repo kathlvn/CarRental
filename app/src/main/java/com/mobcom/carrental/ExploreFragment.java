@@ -7,12 +7,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.CarEntity;
+import com.mobcom.carrental.database.entities.UserEntity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -171,15 +177,67 @@ public class ExploreFragment extends Fragment {
     // ── Car Sections ──────────────────────────────────────────────────────────
 
     private void setupCarSections(View view) {
-        allPopularCars = getSampleCars();
-        allShortTripCars = getSampleCars();
-        allBudgetCars = getSampleCars();
-
+        loadCarsFromDatabase();
         popularAdapter = setupRecyclerView(view, R.id.rvPopularCars, allPopularCars);
         shortTripAdapter = setupRecyclerView(view, R.id.rvShortTrips, allShortTripCars);
         budgetAdapter = setupRecyclerView(view, R.id.rvBudgetFriendly, allBudgetCars);
-
         applyFilters(activeFilters);
+    }
+
+    private void loadCarsFromDatabase() {
+        try {
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+            List<CarEntity> cars = db.carDao().getAvailableCars();
+
+            android.util.Log.d("ExploreFragment", "Loaded " + cars.size() + " available cars from database");
+            for (CarEntity car : cars) {
+                android.util.Log.d("ExploreFragment", "  - " + car.name + " from provider " + car.providerId);
+            }
+
+            allPopularCars.clear();
+            allShortTripCars.clear();
+            allBudgetCars.clear();
+
+            for (CarEntity carEntity : cars) {
+                // Get the provider's actual name
+                UserEntity provider = db.userDao().getUserById(carEntity.providerId);
+                String providerName = (provider != null) ? provider.fullName : carEntity.providerId;
+
+                android.util.Log.d("ExploreFragment", "Creating car: " + carEntity.name + " with provider: " + providerName);
+
+                Car car = createCarFromEntity(carEntity, providerName);
+                allPopularCars.add(car);
+                allShortTripCars.add(car);
+                allBudgetCars.add(car);
+            }
+
+            if (allPopularCars.isEmpty()) {
+                Toast.makeText(getContext(), "No cars available", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            android.util.Log.e("ExploreFragment", "Error loading cars", e);
+            Toast.makeText(getContext(), "Error loading cars: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private Car createCarFromEntity(CarEntity entity, String providerName) {
+        return new Car(
+                entity.carId,
+                entity.name,
+                entity.transmission,
+                entity.seats,
+                entity.fuelType,
+                entity.pricePerDay,
+                (float) entity.distanceKm,
+                R.drawable.ic_rentals,
+                entity.imageUrl,
+                entity.location,
+                providerName,
+                entity.providerId,
+                entity.plateNumber,
+                entity.carType,
+                (float) entity.rating
+        );
     }
 
     private CarAdapter setupRecyclerView(View view, int rvId, List<Car> cars) {
@@ -225,38 +283,11 @@ public class ExploreFragment extends Fragment {
                 .navigate(R.id.action_explore_to_carDetail, args);
     }
 
-    // ── Sample Data ───────────────────────────────────────────────────────────
+    // ── Sample Data (Fallback) ────────────────────────────────────────────────
 
     private List<Car> getSampleCars() {
-        List<Car> cars = new ArrayList<>();
-        cars.add(new Car(
-                "C001", "Toyota Vios 2023", "Automatic", 5,
-                "Gasoline", 1500, 2.1f, R.drawable.ic_rentals,
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
-                "Bacolod City", "Juan dela Cruz", "P001",
-                "ABC 1234", "Sedan", 4.8f));
-
-        cars.add(new Car(
-                "C002", "Honda City 2024", "Automatic", 5,
-                "Gasoline", 1800, 0.8f, R.drawable.ic_rentals,
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
-                "Bacolod City", "Maria Santos", "P002",
-                "XYZ 5678", "Sedan", 4.5f));
-
-        cars.add(new Car(
-                "C003", "Mitsubishi Xpander 2022", "Automatic", 7,
-                "Gasoline", 2000, 3.0f, R.drawable.ic_rentals,
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg/1280px-2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg",
-                "Bacolod City", "Pedro Reyes", "P003",
-                "DEF 9012", "Van", 4.2f));
-
-        cars.add(new Car(
-                "C004", "Mitsubishi Mirage 2022", "Manual", 5,
-                "Gasoline", 1200, 3.0f, R.drawable.ic_rentals,
-                "",
-                "Bacolod City", "Ana Reyes", "P004",
-                "GHI 3456", "Hatchback", 4.0f));
-
-        return cars;
+        // DEPRECATED: Data should load from Firebase
+        // This method is kept as fallback only
+        return new ArrayList<>();
     }
 }
