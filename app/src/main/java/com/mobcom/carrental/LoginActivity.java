@@ -15,6 +15,10 @@ import com.mobcom.carrental.utils.SessionManager;
 
 public class LoginActivity extends AppCompatActivity {
 
+    public static final String EXTRA_AUTH_MODE = "authMode";
+    public static final String MODE_LOGIN = "login";
+    public static final String MODE_SIGN_UP = "signup";
+
     // Mode
     private boolean isRegisterMode = false;
     private String selectedRole = SessionManager.ROLE_CUSTOMER;
@@ -42,9 +46,11 @@ public class LoginActivity extends AppCompatActivity {
         setupTabs();
         setupRoleSelector();
 
-        // Check if opened from "Sign Up" button on Welcome screen
-        if (getIntent().getBooleanExtra("showRegister", false)) {
-            tabAuthMode.selectTab(tabAuthMode.getTabAt(1));
+        String authMode = getIntent().getStringExtra(EXTRA_AUTH_MODE);
+        if (MODE_SIGN_UP.equalsIgnoreCase(authMode)) {
+            setAuthMode(true);
+        } else {
+            setAuthMode(false);
         }
 
         btnPrimaryAction.setOnClickListener(v -> {
@@ -85,14 +91,24 @@ public class LoginActivity extends AppCompatActivity {
         tabAuthMode.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                isRegisterMode = tab.getPosition() == 1;
-                layoutLoginFields.setVisibility(isRegisterMode ? View.GONE : View.VISIBLE);
-                layoutRegisterFields.setVisibility(isRegisterMode ? View.VISIBLE : View.GONE);
-                btnPrimaryAction.setText(isRegisterMode ? "Create Account" : "Log In");
+                setAuthMode(tab.getPosition() == 1);
             }
             @Override public void onTabUnselected(TabLayout.Tab tab) {}
             @Override public void onTabReselected(TabLayout.Tab tab) {}
         });
+    }
+
+    private void setAuthMode(boolean registerMode) {
+        isRegisterMode = registerMode;
+        layoutLoginFields.setVisibility(isRegisterMode ? View.GONE : View.VISIBLE);
+        layoutRegisterFields.setVisibility(isRegisterMode ? View.VISIBLE : View.GONE);
+        btnPrimaryAction.setText(isRegisterMode ? "Create Account" : "Log In");
+
+        int targetIndex = isRegisterMode ? 1 : 0;
+        TabLayout.Tab target = tabAuthMode.getTabAt(targetIndex);
+        if (target != null && tabAuthMode.getSelectedTabPosition() != targetIndex) {
+            target.select();
+        }
     }
 
     private void setupRoleSelector() {

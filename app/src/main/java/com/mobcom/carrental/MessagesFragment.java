@@ -42,6 +42,14 @@ public class MessagesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         sessionManager = new SessionManager(requireContext());
+
+        if (sessionManager.isGuest()) {
+            GuestLoginWallBottomSheet
+                    .newInstance("messages")
+                    .show(getParentFragmentManager(), "GuestLoginWall");
+            return;
+        }
+
         threadId = getArgumentOrDefault("threadId", null);
         peerName = getArgumentOrDefault("peerName", "Conversation");
 

@@ -23,6 +23,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.mobcom.carrental.LocationBottomSheet;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.CarImageAdapter;
 import com.mobcom.carrental.models.CarFormData;
@@ -247,10 +248,19 @@ public class AddEditCarFragment extends Fragment {
 
     private void setupLocationPicker() {
         etLocation.setOnClickListener(v -> {
-            // TODO: open LocationBottomSheet and get result
-            // For now set a placeholder
-            etLocation.setText("Bacolod City");
+            openLocationBottomSheet();
         });
+
+        TextInputLayout tilLocation = requireView().findViewById(R.id.tilLocation);
+        if (tilLocation != null) {
+            tilLocation.setEndIconOnClickListener(v -> openLocationBottomSheet());
+        }
+    }
+
+    private void openLocationBottomSheet() {
+        LocationBottomSheet sheet = new LocationBottomSheet();
+        sheet.setOnLocationSelectedListener(location -> etLocation.setText(location));
+        sheet.show(getParentFragmentManager(), "LocationBottomSheet");
     }
 
     // ── Edit mode population ─────────────────────────────────────────────────

@@ -18,12 +18,15 @@ public class WelcomeActivity extends AppCompatActivity {
         MaterialButton btnSignUp = findViewById(R.id.btnSignUp);
         MaterialButton btnGuest  = findViewById(R.id.btnGuest);
 
-        btnLogin.setOnClickListener(v ->
-                startActivity(new Intent(this, LoginActivity.class)));
+        btnLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(LoginActivity.EXTRA_AUTH_MODE, LoginActivity.MODE_LOGIN);
+            startActivity(intent);
+        });
 
         btnSignUp.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
-            intent.putExtra("showRegister", true);
+            intent.putExtra(LoginActivity.EXTRA_AUTH_MODE, LoginActivity.MODE_SIGN_UP);
             startActivity(intent);
         });
 

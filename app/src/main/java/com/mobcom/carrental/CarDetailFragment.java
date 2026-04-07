@@ -122,7 +122,9 @@ public class CarDetailFragment extends Fragment {
             SessionManager session = new SessionManager(requireContext());
 
             if (session.isGuest()) {
-                // TODO: show guest login wall bottom sheet
+                                GuestLoginWallBottomSheet
+                                                .newInstance("book_now")
+                                                .show(getParentFragmentManager(), "GuestLoginWall");
                 return;
             }
 
