@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -186,12 +187,26 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
     @Override
     public void onCancelRental(Rental rental) {
-        // TODO: Show confirmation dialog, then cancel
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Cancel Booking")
                 .setMessage("Are you sure you want to cancel booking #" + rental.getRentalId() + "?")
                 .setPositiveButton("Yes, Cancel", (dialog, which) -> {
-                    // TODO: API call to cancel
+                    allRentals.remove(rental);
+                    allRentals.add(new Rental(
+                            rental.getRentalId(),
+                            rental.getCarName(),
+                            rental.getCarImageUrl(),
+                            rental.getCarPlate(),
+                            rental.getPickupLocation(),
+                            rental.getStartDate(),
+                            rental.getEndDate(),
+                            rental.getTotalDays(),
+                            rental.getTotalPrice(),
+                            Rental.Status.CANCELLED,
+                            rental.getProviderName()
+                    ));
+                    filterAndShow(currentTab);
+                    Toast.makeText(requireContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Keep Booking", null)
                 .show();
@@ -199,6 +214,9 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
     @Override
     public void onRebook(Rental rental) {
-        // TODO: Pre-fill ExploreFragment search with same car
+        Bundle args = new Bundle();
+        args.putString("prefillLocation", rental.getPickupLocation());
+        androidx.navigation.Navigation.findNavController(requireView())
+                .navigate(R.id.exploreFragment, args);
     }
 }

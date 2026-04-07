@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -188,9 +189,9 @@ public class ProviderBookingsFragment extends Fragment
                         + " for " + booking.getCarName()
                         + " (" + booking.getStartDate() + " → " + booking.getEndDate() + ")")
                 .setPositiveButton("Accept", (dialog, which) -> {
-                    // TODO: API call
                     booking.setStatus(ProviderBooking.Status.CONFIRMED);
                     filterAndShow(currentTab);
+                    Toast.makeText(requireContext(), "Booking accepted", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -210,9 +211,11 @@ public class ProviderBookingsFragment extends Fragment
                 .setTitle("Reject Booking")
                 .setMessage("Select a reason for rejection:")
                 .setItems(reasons, (dialog, which) -> {
-                    // TODO: API call with reason
                     booking.setStatus(ProviderBooking.Status.REJECTED);
                     filterAndShow(currentTab);
+                    Toast.makeText(requireContext(),
+                            "Booking rejected: " + reasons[which],
+                            Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -229,6 +232,14 @@ public class ProviderBookingsFragment extends Fragment
 
     @Override
     public void onViewDetail(ProviderBooking booking) {
-        // TODO: navigate to BookingDetailFragment
+        new MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Booking #" + booking.getBookingId())
+            .setMessage("Car: " + booking.getCarName()
+                + "\nCustomer: " + booking.getCustomerName()
+                + "\nDates: " + booking.getStartDate() + " to " + booking.getEndDate()
+                + "\nPickup: " + booking.getPickupLocation()
+                + "\nStatus: " + booking.getStatus().name())
+            .setPositiveButton("OK", null)
+            .show();
     }
 }

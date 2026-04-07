@@ -146,8 +146,7 @@ public class LoginActivity extends AppCompatActivity {
         tilEmail.setError(null);
         tilPassword.setError(null);
 
-        // TODO: replace with real API call
-        // Dummy credentials for testing
+        // Local demo credentials for testing
         if (email.equals("customer@test.com") && password.equals("1234")) {
             new SessionManager(this).login("C001", "Juan dela Cruz", email, SessionManager.ROLE_CUSTOMER);
             goToCustomer();
@@ -200,13 +199,11 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!valid) return;
 
-        // TODO: replace with real API call
         // For now, simulate successful registration
         new SessionManager(this).login("NEW001", fullName, email, selectedRole);
 
         if (selectedRole.equals(SessionManager.ROLE_PROVIDER)) {
-            // TODO: goToProvider();
-            goToCustomer(); // temporary fallback
+            goToProvider();
         } else {
             goToCustomer();
         }

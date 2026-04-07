@@ -26,6 +26,12 @@ public class ExploreFragment extends Fragment {
     private boolean isExpanded = false;
     private Calendar startCalendar = Calendar.getInstance();
     private Calendar endCalendar = Calendar.getInstance();
+    private List<Car> allPopularCars = new ArrayList<>();
+    private List<Car> allShortTripCars = new ArrayList<>();
+    private List<Car> allBudgetCars = new ArrayList<>();
+    private CarAdapter popularAdapter;
+    private CarAdapter shortTripAdapter;
+    private CarAdapter budgetAdapter;
 
     @Nullable
     @Override
@@ -38,6 +44,14 @@ public class ExploreFragment extends Fragment {
         tvStartDate = view.findViewById(R.id.tvStartDate);
         tvEndDate   = view.findViewById(R.id.tvEndDate);
         dateRangeRow= view.findViewById(R.id.dateRangeRow);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            String prefillLocation = args.getString("prefillLocation", "");
+            if (!prefillLocation.isEmpty()) {
+                tvLocation.setText(prefillLocation);
+            }
+        }
 
         // Set default dates (today and 4 days later)
         endCalendar.add(Calendar.DAY_OF_MONTH, 4);
@@ -108,21 +122,62 @@ public class ExploreFragment extends Fragment {
 
     private void openFilterSheet() {
         FilterBottomSheet sheet = new FilterBottomSheet();
-        sheet.setOnFiltersAppliedListener(options -> {
-            // TODO: apply filters to car lists
-        });
+        sheet.setOnFiltersAppliedListener(this::applyFilters);
         sheet.show(getParentFragmentManager(), "FilterBottomSheet");
+    }
+
+    private void applyFilters(FilterBottomSheet.FilterOptions options) {
+        popularAdapter.updateList(filterCars(allPopularCars, options));
+        shortTripAdapter.updateList(filterCars(allShortTripCars, options));
+        budgetAdapter.updateList(filterCars(allBudgetCars, options));
+    }
+
+    private List<Car> filterCars(List<Car> source, FilterBottomSheet.FilterOptions options) {
+        List<Car> filtered = new ArrayList<>();
+        for (Car car : source) {
+            if (car.getPricePerDay() < options.minPrice || car.getPricePerDay() > options.maxPrice) {
+                continue;
+            }
+            if (!"Any".equalsIgnoreCase(options.transmission)
+                    && !car.getTransmission().equalsIgnoreCase(options.transmission)) {
+                continue;
+            }
+            if (options.seats > 0) {
+                if (options.seats >= 7) {
+                    if (car.getSeats() < 7) continue;
+                } else if (car.getSeats() != options.seats) {
+                    continue;
+                }
+            }
+            if (!"Any".equalsIgnoreCase(options.fuelType)
+                    && !car.getFuelType().equalsIgnoreCase(options.fuelType)) {
+                continue;
+            }
+            if (!"Any".equalsIgnoreCase(options.carType)
+                    && !car.getCarType().equalsIgnoreCase(options.carType)) {
+                continue;
+            }
+            if (car.getRating() < options.minRating) {
+                continue;
+            }
+            filtered.add(car);
+        }
+        return filtered;
     }
 
     // ── Car Sections ──────────────────────────────────────────────────────────
 
     private void setupCarSections(View view) {
-        setupRecyclerView(view, R.id.rvPopularCars, getSampleCars());
-        setupRecyclerView(view, R.id.rvShortTrips, getSampleCars());
-        setupRecyclerView(view, R.id.rvBudgetFriendly, getSampleCars());
+        allPopularCars = getSampleCars();
+        allShortTripCars = getSampleCars();
+        allBudgetCars = getSampleCars();
+
+        popularAdapter = setupRecyclerView(view, R.id.rvPopularCars, allPopularCars);
+        shortTripAdapter = setupRecyclerView(view, R.id.rvShortTrips, allShortTripCars);
+        budgetAdapter = setupRecyclerView(view, R.id.rvBudgetFriendly, allBudgetCars);
     }
 
-    private void setupRecyclerView(View view, int rvId, List<Car> cars) {
+    private CarAdapter setupRecyclerView(View view, int rvId, List<Car> cars) {
         RecyclerView rv = view.findViewById(rvId);
         rv.setLayoutManager(new LinearLayoutManager(
                 getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -130,6 +185,7 @@ public class ExploreFragment extends Fragment {
         CarAdapter adapter = new CarAdapter(getContext(), cars);
         adapter.setOnCarClickListener(car -> navigateToCarDetail(car));
         rv.setAdapter(adapter);
+        return adapter;
     }
 
     private void navigateToCarDetail(Car car) {

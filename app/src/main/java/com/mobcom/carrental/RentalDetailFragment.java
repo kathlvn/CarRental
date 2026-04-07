@@ -1,12 +1,15 @@
 package com.mobcom.carrental;
 
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -190,13 +193,19 @@ public class RentalDetailFragment extends Fragment {
             case ACTIVE:
                 btnPrimary.setText("View on Map");
                 btnPrimary.setOnClickListener(v -> {
-                    // TODO: open map with pickup location
+                    String query = Uri.encode(rental.getPickupLocation());
+                    Intent intent = new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("geo:0,0?q=" + query));
+                    startActivity(intent);
                 });
                 break;
             case COMPLETED:
                 btnPrimary.setText("Rebook");
                 btnPrimary.setOnClickListener(v -> {
-                    // TODO: navigate back to car detail with same car
+                    Bundle args = new Bundle();
+                    args.putString("prefillLocation", rental.getPickupLocation());
+                    androidx.navigation.Navigation.findNavController(v)
+                            .navigate(R.id.exploreFragment, args);
                 });
                 break;
             case CANCELLED:
@@ -211,7 +220,23 @@ public class RentalDetailFragment extends Fragment {
                 .setMessage("Are you sure you want to cancel booking #"
                         + rental.getRentalId() + "? This action cannot be undone.")
                 .setPositiveButton("Yes, Cancel", (dialog, which) -> {
-                    // TODO: API call to cancel, then pop back
+                rental = new Rental(
+                    rental.getRentalId(),
+                    rental.getCarName(),
+                    rental.getCarImageUrl(),
+                    rental.getCarPlate(),
+                    rental.getPickupLocation(),
+                    rental.getStartDate(),
+                    rental.getEndDate(),
+                    rental.getTotalDays(),
+                    rental.getTotalPrice(),
+                    Rental.Status.CANCELLED,
+                    rental.getProviderName()
+                );
+                populateData();
+                setupStatusTracker();
+                setupActionButtons();
+                Toast.makeText(requireContext(), "Booking cancelled", Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Keep Booking", null)
                 .show();

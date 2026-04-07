@@ -18,6 +18,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.AdminListingAdapter;
 import com.mobcom.carrental.models.AdminListing;
+import com.mobcom.carrental.models.AdminProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -263,11 +264,42 @@ public class AdminListingsFragment extends Fragment
 
     @Override
     public void onViewProvider(AdminListing listing) {
-        // TODO: navigate to AdminProviderDetailFragment
+        AdminProvider provider = new AdminProvider(
+                listing.getProviderId(),
+                listing.getProviderName(),
+                listing.getProviderEmail(),
+                "N/A",
+                listing.getLocation(),
+                "Unknown",
+                mapTrustLevel(listing.getProviderTrustLevel()),
+                listing.getProviderApprovedListings(),
+                listing.getProviderApprovedListings(),
+            0,
+            0,
+            listing.getProviderReports(),
+            listing.getProviderRating(),
+                0,
+                0,
+                ""
+        );
+
         Bundle args = new Bundle();
-        args.putString("providerId", listing.getProviderId());
+        args.putSerializable("provider", provider);
         androidx.navigation.fragment.NavHostFragment
                 .findNavController(AdminListingsFragment.this)
                 .navigate(R.id.action_listings_to_providerDetail, args);
+    }
+
+    private AdminProvider.TrustLevel mapTrustLevel(String trustLevel) {
+        if ("TRUSTED".equalsIgnoreCase(trustLevel)) {
+            return AdminProvider.TrustLevel.TRUSTED;
+        }
+        if ("FLAGGED".equalsIgnoreCase(trustLevel)) {
+            return AdminProvider.TrustLevel.FLAGGED;
+        }
+        if ("SUSPENDED".equalsIgnoreCase(trustLevel)) {
+            return AdminProvider.TrustLevel.SUSPENDED;
+        }
+        return AdminProvider.TrustLevel.PROBATION;
     }
 }

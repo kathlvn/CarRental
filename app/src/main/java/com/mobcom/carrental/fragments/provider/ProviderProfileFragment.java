@@ -161,7 +161,6 @@ public class ProviderProfileFragment extends Fragment {
     }
 
     private TrustLevel getTrustLevel() {
-        // TODO: replace with real trust level from backend
         // For now derive from approvedListings count
         if (approvedListings >= TRUSTED_THRESHOLD) {
             return TrustLevel.TRUSTED;
@@ -225,10 +224,8 @@ public class ProviderProfileFragment extends Fragment {
         });
 
         layoutAddCar.setOnClickListener(v -> {
-            BottomNavigationView nav =
-                    requireActivity().findViewById(R.id.provider_bottom_nav);
-            nav.setSelectedItemId(R.id.providerMyCarsFragment);
-            // TODO: trigger FAB click to open AddEditCarFragment directly
+            androidx.navigation.Navigation.findNavController(v)
+                    .navigate(R.id.addEditCarFragment);
         });
     }
 

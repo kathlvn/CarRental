@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.models.Booking;
 import com.mobcom.carrental.Car;
@@ -29,6 +31,7 @@ public class BookingFormFragment extends Fragment {
     private TextView tvStartDate, tvEndDate, tvTotalDays;
     private TextView tvBreakdownRate, tvBreakdownRateValue;
     private TextView tvBreakdownFee, tvBreakdownTotal;
+    private TextInputLayout tilPickupLocation;
     private TextInputEditText etPickupLocation, etNote;
     private LinearLayout layoutCash, layoutOnline;
     private TextView tvCashSelected;
@@ -72,10 +75,7 @@ public class BookingFormFragment extends Fragment {
 
         setupPaymentSelector();
 
-        etPickupLocation.setOnClickListener(v -> {
-            // TODO: open LocationBottomSheet
-            etPickupLocation.setText(car != null ? car.getLocation() : "");
-        });
+        tilPickupLocation.setEndIconOnClickListener(v -> openPickupLocationSheet());
 
         btnConfirmBooking.setOnClickListener(v -> {
             if (validateForm()) submitBooking();
@@ -94,6 +94,7 @@ public class BookingFormFragment extends Fragment {
         tvBreakdownRateValue= view.findViewById(R.id.tvBreakdownRateValue);
         tvBreakdownFee      = view.findViewById(R.id.tvBreakdownFee);
         tvBreakdownTotal    = view.findViewById(R.id.tvBreakdownTotal);
+        tilPickupLocation   = view.findViewById(R.id.tilPickupLocation);
         etPickupLocation    = view.findViewById(R.id.etPickupLocation);
         etNote              = view.findViewById(R.id.etNote);
         layoutCash          = view.findViewById(R.id.layoutCash);
@@ -106,6 +107,12 @@ public class BookingFormFragment extends Fragment {
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v ->
                 requireActivity().getOnBackPressedDispatcher().onBackPressed());
+    }
+
+    private void openPickupLocationSheet() {
+        LocationBottomSheet sheet = new LocationBottomSheet();
+        sheet.setOnLocationSelectedListener(location -> etPickupLocation.setText(location));
+        sheet.show(getParentFragmentManager(), "BookingPickupLocationSheet");
     }
 
     private void populateCarInfo() {
@@ -149,7 +156,9 @@ public class BookingFormFragment extends Fragment {
 
         // Online payment disabled for now
         layoutOnline.setOnClickListener(v -> {
-            // TODO: enable when online payment is ready
+            Toast.makeText(requireContext(),
+                    "Online payment is coming soon. Use cash on pickup for now.",
+                    Toast.LENGTH_SHORT).show();
         });
     }
 

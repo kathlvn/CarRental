@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -157,11 +158,13 @@ public class ProviderMyCarsFragment extends Fragment implements ProviderCarAdapt
                         ? "This car will no longer appear in search results."
                         : "This car will be visible to customers again.")
                 .setPositiveButton("Confirm", (dialog, which) -> {
-                    // TODO: API call
                     car.setStatus(car.getStatus() == ProviderCar.Status.ACTIVE
                             ? ProviderCar.Status.INACTIVE
                             : ProviderCar.Status.ACTIVE);
                     filterAndShow(currentTab);
+                    Toast.makeText(requireContext(),
+                        "Listing status updated",
+                        Toast.LENGTH_SHORT).show();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();

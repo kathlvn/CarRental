@@ -12,6 +12,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
+import android.widget.Toast;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -383,9 +384,10 @@ public class AddEditCarFragment extends Fragment {
         formData.setCrNumber(etCrNumber.getText().toString());
         formData.setAlwaysAvailable(switchAlwaysAvailable.isChecked());
 
-        // TODO: send formData to API/backend
 
-        // Show success and go back
+        Toast.makeText(requireContext(),
+                isEditMode ? "Changes saved locally" : "Listing saved locally",
+                Toast.LENGTH_SHORT).show();
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(isEditMode ? "Listing Updated!" : "Listing Submitted!")
                 .setMessage(isEditMode

@@ -320,11 +320,23 @@ public class ProviderDashboardFragment extends Fragment
 
     @Override
     public void onContact(ProviderBooking booking) {
-        // TODO: navigate to messages
+        Bundle args = new Bundle();
+        args.putString("threadId", booking.getBookingId());
+        args.putString("peerName", booking.getCustomerName());
+        androidx.navigation.Navigation.findNavController(requireView())
+            .navigate(R.id.providerMessagesFragment, args);
     }
 
     @Override
     public void onViewDetail(ProviderBooking booking) {
-        // TODO: navigate to booking detail
+        new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Booking #" + booking.getBookingId())
+            .setMessage("Car: " + booking.getCarName()
+                + "\nCustomer: " + booking.getCustomerName()
+                + "\nDates: " + booking.getStartDate() + " to " + booking.getEndDate()
+                + "\nPickup: " + booking.getPickupLocation()
+                + "\nAmount: ₱" + String.format("%,.0f", booking.getTotalAmount()))
+            .setPositiveButton("OK", null)
+            .show();
     }
 }

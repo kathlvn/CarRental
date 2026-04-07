@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
@@ -87,6 +88,11 @@ public class CarAdapter extends RecyclerView.Adapter<CarAdapter.CarViewHolder> {
 
     public void setOnCarClickListener(OnCarClickListener listener) {
         this.clickListener = listener;
+    }
+
+    public void updateList(List<Car> newCars) {
+        this.carList = new ArrayList<>(newCars);
+        notifyDataSetChanged();
     }
 
 }

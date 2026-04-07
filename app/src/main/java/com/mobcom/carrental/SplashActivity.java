@@ -40,7 +40,6 @@ public class SplashActivity extends AppCompatActivity {
     private void routeByRole(String role) {
         switch (role) {
             case SessionManager.ROLE_PROVIDER:
-                // TODO: startActivity(new Intent(this, ProviderMainActivity.class));
                 startActivity(new Intent(this, ProviderMainActivity.class));
                 break;
             case SessionManager.ROLE_ADMIN:
