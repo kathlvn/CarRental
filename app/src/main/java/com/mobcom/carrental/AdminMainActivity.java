@@ -13,6 +13,7 @@ import com.mobcom.carrental.utils.BookingService;
 import com.mobcom.carrental.utils.DatabaseChatStore;
 import com.mobcom.carrental.utils.ReviewService;
 import com.mobcom.carrental.utils.ReportService;
+import com.mobcom.carrental.utils.CarService;
 import com.mobcom.carrental.utils.SessionManager;
 import com.mobcom.carrental.database.DatabaseInitializer;
 
@@ -31,6 +32,7 @@ public class AdminMainActivity extends AppCompatActivity {
         BookingService.initialize(this);
         ReviewService.initialize(this);
         ReportService.initialize(this);
+        CarService.initialize(this);
 
         DatabaseInitializer.initializeDatabase(this);
 

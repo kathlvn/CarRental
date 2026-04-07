@@ -1,6 +1,7 @@
 package com.mobcom.carrental.database;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.mobcom.carrental.database.entities.BookingEntity;
@@ -13,11 +14,22 @@ import java.util.List;
 
 public class DatabaseInitializer {
     private static final String TAG = "DatabaseInitializer";
+    private static final String PREFS_NAME = "CarRental_Prefs";
+    private static final String KEY_DB_INITIALIZED = "database_initialized";
 
     public static void initializeDatabase(Context context) {
+        // Check if database is already initialized
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isInitialized = prefs.getBoolean(KEY_DB_INITIALIZED, false);
+
+        if (isInitialized) {
+            Log.d(TAG, "Database already initialized, skipping initialization");
+            return;
+        }
+
         Log.d(TAG, "Starting database initialization");
 
-        // Wipe all existing data FIRST
+        // Wipe all existing data FIRST (only on first run)
         AppDatabase.wipeAllData(context);
 
         // Get a FRESH instance after wiping
@@ -34,6 +46,9 @@ public class DatabaseInitializer {
 
         // Populate rentals
         populateRentals(db);
+
+        // Mark database as initialized
+        prefs.edit().putBoolean(KEY_DB_INITIALIZED, true).apply();
 
         Log.d(TAG, "Database initialization completed");
     }
@@ -119,6 +134,7 @@ public class DatabaseInitializer {
         CarEntity car = new CarEntity(carId, providerId, name, carType, transmission, seats,
                 fuelType, pricePerDay, rating, plateNumber, "Metro Manila", "",
                 carType + " - " + transmission + " - " + seats + " seats", true);
+        car.approvalStatus = "APPROVED";  // Sample cars are pre-approved
         car.totalRentals = (int)(Math.random() * 100);
         return car;
     }
