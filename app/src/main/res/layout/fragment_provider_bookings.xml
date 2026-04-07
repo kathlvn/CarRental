@@ -37,18 +37,18 @@
                     android:textStyle="bold"
                     android:textColor="@android:color/white" />
 
-                <!-- Pending count badge -->
-                <TextView
-                    android:id="@+id/tvPendingCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/bg_status_badge"
-                    android:visibility="gone" />
+                <!-- Open messages -->
+                <ImageView
+                    android:id="@+id/btnOpenMessages"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="#2AFFFFFF"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_messages"
+                    android:contentDescription="open messages"
+                    android:clickable="true"
+                    android:focusable="true"
+                    app:tint="@android:color/white" />
 
             </LinearLayout>
 

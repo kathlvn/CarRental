@@ -20,6 +20,11 @@
         android:label="Bookings" />
 
     <fragment
+        android:id="@+id/providerMessagesFragment"
+        android:name="com.mobcom.carrental.fragments.provider.ProviderMessagesFragment"
+        android:label="Messages" />
+
+    <fragment
         android:id="@+id/providerProfileFragment"
         android:name="com.mobcom.carrental.fragments.provider.ProviderProfileFragment"
         android:label="Profile" />

@@ -109,6 +109,15 @@ public class CarDetailFragment extends Fragment {
                         .findNavController(CarDetailFragment.this)
                         .popBackStack());
 
+        view.findViewById(R.id.btnMessageProvider).setOnClickListener(v -> {
+            Bundle chatArgs = new Bundle();
+            chatArgs.putString("threadId", "provider-" + car.getProviderId());
+            chatArgs.putString("peerName", car.getProviderName());
+            androidx.navigation.fragment.NavHostFragment
+                    .findNavController(CarDetailFragment.this)
+                    .navigate(R.id.messagesFragment, chatArgs);
+        });
+
         view.findViewById(R.id.btnBookNow).setOnClickListener(v -> {
             SessionManager session = new SessionManager(requireContext());
 

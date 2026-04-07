@@ -1,9 +1,10 @@
-+package com.mobcom.carrental.fragments.provider;
+package com.mobcom.carrental.fragments.provider;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -26,7 +27,8 @@ public class ProviderBookingsFragment extends Fragment
     private TabLayout tabBookings;
     private RecyclerView rvBookings;
     private LinearLayout layoutEmpty;
-    private TextView tvEmptyTitle, tvEmptySubtitle, tvPendingCount;
+    private TextView tvEmptyTitle, tvEmptySubtitle;
+    private ImageView btnOpenMessages;
 
     private ProviderBookingAdapter adapter;
     private List<ProviderBooking> allBookings = new ArrayList<>();
@@ -49,13 +51,15 @@ public class ProviderBookingsFragment extends Fragment
         layoutEmpty    = view.findViewById(R.id.layoutEmpty);
         tvEmptyTitle   = view.findViewById(R.id.tvEmptyTitle);
         tvEmptySubtitle= view.findViewById(R.id.tvEmptySubtitle);
-        tvPendingCount = view.findViewById(R.id.tvPendingCount);
+        btnOpenMessages = view.findViewById(R.id.btnOpenMessages);
 
         setupTabs();
         setupRecyclerView();
         loadDummyData();
         filterAndShow(0);
-        updatePendingBadge();
+        btnOpenMessages.setOnClickListener(v ->
+            androidx.navigation.Navigation.findNavController(v)
+                .navigate(R.id.providerMessagesFragment));
     }
 
     private void setupTabs() {
@@ -142,21 +146,6 @@ public class ProviderBookingsFragment extends Fragment
         }
     }
 
-    private void updatePendingBadge() {
-        long pendingCount = allBookings.stream()
-                .filter(b -> b.getStatus() == ProviderBooking.Status.PENDING)
-                .count();
-
-        if (pendingCount > 0) {
-            tvPendingCount.setVisibility(View.VISIBLE);
-            tvPendingCount.setText(pendingCount + " new");
-            tvPendingCount.getBackground().setTint(
-                    android.graphics.Color.parseColor("#FF9800"));
-        } else {
-            tvPendingCount.setVisibility(View.GONE);
-        }
-    }
-
     // ── Dummy data ────────────────────────────────────────────────────────────
 
     private void loadDummyData() {
@@ -202,7 +191,6 @@ public class ProviderBookingsFragment extends Fragment
                     // TODO: API call
                     booking.setStatus(ProviderBooking.Status.CONFIRMED);
                     filterAndShow(currentTab);
-                    updatePendingBadge();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -225,7 +213,6 @@ public class ProviderBookingsFragment extends Fragment
                     // TODO: API call with reason
                     booking.setStatus(ProviderBooking.Status.REJECTED);
                     filterAndShow(currentTab);
-                    updatePendingBadge();
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -233,7 +220,11 @@ public class ProviderBookingsFragment extends Fragment
 
     @Override
     public void onContact(ProviderBooking booking) {
-        // TODO: navigate to MessagesFragment with this customer
+        Bundle args = new Bundle();
+        args.putString("threadId", booking.getBookingId());
+        args.putString("peerName", booking.getCustomerName());
+        androidx.navigation.Navigation.findNavController(requireView())
+                .navigate(R.id.providerMessagesFragment, args);
     }
 
     @Override

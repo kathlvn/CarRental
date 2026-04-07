@@ -173,7 +173,11 @@ public class RentalDetailFragment extends Fragment {
     private void setupActionButtons() {
         // Contact provider always available
         btnContact.setOnClickListener(v -> {
-            // TODO: Navigate to MessagesFragment with this provider
+            Bundle args = new Bundle();
+            args.putString("threadId", rental.getRentalId());
+            args.putString("peerName", rental.getProviderName());
+            androidx.navigation.Navigation.findNavController(v)
+                    .navigate(R.id.messagesFragment, args);
         });
 
         // Primary button changes based on status

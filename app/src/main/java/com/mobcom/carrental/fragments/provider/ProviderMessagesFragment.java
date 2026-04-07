@@ -1,4 +1,4 @@
-package com.mobcom.carrental;
+package com.mobcom.carrental.fragments.provider;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -13,13 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.ChatMessageAdapter;
 import com.mobcom.carrental.models.ChatMessage;
 import com.mobcom.carrental.utils.ChatMemoryStore;
 import com.mobcom.carrental.utils.SessionManager;
 import java.util.List;
 
-public class MessagesFragment extends Fragment {
+public class ProviderMessagesFragment extends Fragment {
 
     private RecyclerView rvMessages;
     private TextInputEditText etMessage;
@@ -33,7 +34,9 @@ public class MessagesFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_message, container, false);
     }
 
@@ -43,14 +46,14 @@ public class MessagesFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         threadId = getArgumentOrDefault("threadId", null);
-        peerName = getArgumentOrDefault("peerName", "Conversation");
+        peerName = getArgumentOrDefault("peerName", "Customer");
 
         if (threadId == null || threadId.isEmpty()) {
-            String anyThreadId = ChatMemoryStore.getAnyThreadId();
-            threadId = anyThreadId == null ? "general-thread" : anyThreadId;
-            if (anyThreadId == null) {
-                ChatMemoryStore.sendMessage(threadId, SessionManager.ROLE_PROVIDER,
-                        "Provider", "Hello! How can I help you today?");
+            String anyThread = ChatMemoryStore.getAnyThreadId();
+            threadId = anyThread == null ? "provider-general-thread" : anyThread;
+            if (anyThread == null) {
+                ChatMemoryStore.sendMessage(threadId, SessionManager.ROLE_CUSTOMER,
+                        "Customer", "Hi! I need help with my booking.");
             }
         }
 
@@ -69,7 +72,7 @@ public class MessagesFragment extends Fragment {
     }
 
     private void setupRecycler() {
-        adapter = new ChatMessageAdapter(SessionManager.ROLE_CUSTOMER);
+        adapter = new ChatMessageAdapter(SessionManager.ROLE_PROVIDER);
         rvMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvMessages.setAdapter(adapter);
     }
@@ -86,8 +89,8 @@ public class MessagesFragment extends Fragment {
                 return;
             }
 
-            String name = sessionManager.getName().isEmpty() ? "Customer" : sessionManager.getName();
-            ChatMemoryStore.sendMessage(threadId, SessionManager.ROLE_CUSTOMER, name, text);
+            String name = sessionManager.getName().isEmpty() ? "Provider" : sessionManager.getName();
+            ChatMemoryStore.sendMessage(threadId, SessionManager.ROLE_PROVIDER, name, text);
             etMessage.setText("");
             refreshMessages();
         });

@@ -156,19 +156,19 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
     // ── Dummy data (replace with real API/DB later) ──────────────────────────
     private void loadDummyData() {
-        allRentals.add(new Rental("20240001", "Toyota Vios 2023",
+        allRentals.add(new Rental("BK001", "Toyota Vios 2023",
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
                 "ABC 1234", "SM City Bacolod, Reclamation Area",
                 "Jun 10, 2025", "Jun 13, 2025", 3, 4500,
                 Rental.Status.CONFIRMED, "Juan dela Cruz"));
 
-        allRentals.add(new Rental("20240002", "Honda City 2022",
+        allRentals.add(new Rental("BK002", "Honda City 2022",
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
                 "XYZ 5678", "Robinsons Place Bacolod",
                 "May 1, 2025", "May 3, 2025", 2, 3000,
                 Rental.Status.COMPLETED, "Maria Santos"));
 
-        allRentals.add(new Rental("20240003", "Mitsubishi Xpander",
+        allRentals.add(new Rental("BK003", "Mitsubishi Xpander",
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg/1280px-2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg",
                 "DEF 9012", "Bacolod-Silay Airport",
                 "Apr 20, 2025", "Apr 22, 2025", 2, 5000,
