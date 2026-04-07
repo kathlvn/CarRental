@@ -1,4 +1,4 @@
-package com.mobcom.carrental.fragments.provider;
+package com.mobcom.carrental.fragments.admin;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,7 +25,7 @@ import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProviderMessagesFragment extends Fragment {
+public class AdminMessagesFragment extends Fragment {
 
     private RecyclerView rvMessages;
     private RecyclerView rvConversations;
@@ -62,7 +62,7 @@ public class ProviderMessagesFragment extends Fragment {
 
         sessionManager = new SessionManager(requireContext());
         threadId = getArgumentOrDefault("threadId", null);
-        peerName = getArgumentOrDefault("peerName", "Customer");
+        peerName = getArgumentOrDefault("peerName", "User");
 
         if (threadId != null && !threadId.isEmpty()) {
             // Show chat view
@@ -82,13 +82,13 @@ public class ProviderMessagesFragment extends Fragment {
         btnSend = view.findViewById(R.id.btnSend);
         MaterialToolbar toolbar = view.findViewById(R.id.toolbarMessages);
 
-        adapter = new ChatMessageAdapter(SessionManager.ROLE_PROVIDER);
+        adapter = new ChatMessageAdapter(SessionManager.ROLE_ADMIN);
         rvMessages.setLayoutManager(new LinearLayoutManager(requireContext()));
         rvMessages.setAdapter(adapter);
 
-        tvThreadInfo.setText("Chat with " + peerName);
+        tvThreadInfo.setText("Chat with " + peerName + " (Admin)");
 
-        // Add back button (navigate to provider messages list)
+        // Add back button
         toolbar.setNavigationOnClickListener(v -> {
             NavHostFragment.findNavController(this).popBackStack();
         });
@@ -100,9 +100,9 @@ public class ProviderMessagesFragment extends Fragment {
                 return;
             }
 
-            String name = sessionManager.getName().isEmpty() ? "Provider" : sessionManager.getName();
+            String name = sessionManager.getName().isEmpty() ? "Admin" : sessionManager.getName();
             String userId = sessionManager.getEmail();
-            DatabaseChatStore.sendMessage(threadId, SessionManager.ROLE_PROVIDER, userId, name, text);
+            DatabaseChatStore.sendMessage(threadId, SessionManager.ROLE_ADMIN, userId, name, text);
             etMessage.setText("");
             refreshMessages();
         });
@@ -119,7 +119,8 @@ public class ProviderMessagesFragment extends Fragment {
             Bundle args = new Bundle();
             args.putString("threadId", conversation.threadId);
             args.putString("peerName", conversation.peerName);
-            NavHostFragment.findNavController(this).navigate(R.id.providerMessagesFragment, args);
+            // TODO: Add chat detail fragment to admin_nav_graph.xml
+            // NavHostFragment.findNavController(this).navigate(R.id.adminMessagesFragment, args);
         });
 
         rvConversations.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -157,10 +158,7 @@ public class ProviderMessagesFragment extends Fragment {
     }
 
     private String extractPeerNameFromThread(String threadId, ChatMessage lastMsg) {
-        // Extract peer name from thread ID or last message
-        if (threadId.startsWith("provider-")) {
-            return threadId.substring(9); // Remove "provider-" prefix
-        }
+        // Extract peer name from last message or thread ID
         return lastMsg.getSenderName() != null ? lastMsg.getSenderName() : "Unknown";
     }
 

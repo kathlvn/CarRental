@@ -19,6 +19,9 @@ import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.AdminListingAdapter;
 import com.mobcom.carrental.models.AdminListing;
 import com.mobcom.carrental.models.AdminProvider;
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.CarEntity;
+import com.mobcom.carrental.database.entities.UserEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,10 +62,19 @@ public class AdminListingsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        // loadDummyData(); // Load from database instead
+        loadListingsFromDatabase();
         filterAndShow();
         updatePendingBadge();
         setupRiskFilter();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh listings when returning to this fragment
+        loadListingsFromDatabase();
+        filterAndShow();
+        updatePendingBadge();
     }
 
     private void setupTabs() {
@@ -169,6 +181,81 @@ public class AdminListingsFragment extends Fragment
 
     // ── Dummy Data ────────────────────────────────────────────────────────────
 
+    private void loadListingsFromDatabase() {
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+        java.util.List<CarEntity> carEntities = db.carDao().getAllCars();
+
+        allListings.clear();
+        for (CarEntity car : carEntities) {
+            // Get provider info
+            UserEntity provider = db.userDao().getUserById(car.providerId);
+            if (provider == null) continue;
+
+            // Map approval status to AdminListing.Status
+            AdminListing.Status status = mapApprovalStatus(car.approvalStatus);
+
+            AdminListing listing = new AdminListing(
+                    car.carId,
+                    car.name,
+                    car.plateNumber,
+                    car.imageUrl,
+                    car.carType,
+                    car.transmission,
+                    car.fuelType,
+                    car.seats,
+                    car.pricePerDay,
+                    car.location,
+                    "", // OR Number (not stored in CarEntity)
+                    "", // CR Number (not stored in CarEntity)
+                    car.providerId,
+                    provider.fullName,
+                    provider.email,
+                    0,  // reports (would need separate query)
+                    0,  // totalListings (would need count query)
+                    (float) provider.rating,
+                    provider.verificationStatus != null ? provider.verificationStatus : "",
+                    status,
+                    getTimeAgo(car.createdAt)
+            );
+
+            // Set rejection reason if rejected
+            if (status == AdminListing.Status.REJECTED && car.rejectionReason != null) {
+                listing.setRejectionReason(car.rejectionReason);
+            }
+
+            allListings.add(listing);
+        }
+
+        // Fallback to empty state if no listings
+        if (allListings.isEmpty()) {
+            // Don't load dummy data - let empty state show
+        }
+    }
+
+    private AdminListing.Status mapApprovalStatus(String status) {
+        if (status == null) return AdminListing.Status.PENDING_REVIEW;
+        switch (status) {
+            case "APPROVED": return AdminListing.Status.APPROVED;
+            case "REJECTED": return AdminListing.Status.REJECTED;
+            default: return AdminListing.Status.PENDING_REVIEW;
+        }
+    }
+
+    private String getTimeAgo(long timestamp) {
+        long now = System.currentTimeMillis();
+        long diffMs = now - timestamp;
+        long diffSecs = diffMs / 1000;
+        long diffMins = diffSecs / 60;
+        long diffHours = diffMins / 60;
+        long diffDays = diffHours / 24;
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return diffMins + " min" + (diffMins > 1 ? "s" : "") + " ago";
+        if (diffHours < 24) return diffHours + " hour" + (diffHours > 1 ? "s" : "") + " ago";
+        if (diffDays < 7) return diffDays + " day" + (diffDays > 1 ? "s" : "") + " ago";
+        return "Long ago";
+    }
+
     private void loadDummyData() {
         // New provider, no OR/CR — HIGH risk
         allListings.add(new AdminListing(
@@ -228,9 +315,16 @@ public class AdminListingsFragment extends Fragment
                         + (listing.getProviderApprovedListings() + 1)
                         + "/3 approved listings."))
                 .setPositiveButton("Approve", (dialog, which) -> {
+                    // Update listing in database
+                    AppDatabase db = AppDatabase.getInstance(requireContext());
+                    CarEntity car = db.carDao().getCarById(listing.getListingId());
+                    if (car != null) {
+                        car.approvalStatus = "APPROVED";
+                        db.carDao().update(car);
+                    }
+
                     listing.setStatus(AdminListing.Status.APPROVED);
-                    listing.setProviderApprovedListings(
-                            listing.getProviderApprovedListings() + 1);
+                    listing.setProviderApprovedListings(listing.getProviderApprovedListings() + 1);
                     filterAndShow();
                     updatePendingBadge();
                 })
@@ -253,6 +347,15 @@ public class AdminListingsFragment extends Fragment
                 .setTitle("Reject Listing")
                 .setMessage("Select a reason for rejection:")
                 .setItems(reasons, (dialog, which) -> {
+                    // Update listing in database
+                    AppDatabase db = AppDatabase.getInstance(requireContext());
+                    CarEntity car = db.carDao().getCarById(listing.getListingId());
+                    if (car != null) {
+                        car.approvalStatus = "REJECTED";
+                        car.rejectionReason = reasons[which];
+                        db.carDao().update(car);
+                    }
+
                     listing.setStatus(AdminListing.Status.REJECTED);
                     listing.setRejectionReason(reasons[which]);
                     filterAndShow();

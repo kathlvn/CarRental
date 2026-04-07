@@ -14,7 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.AdminProviderAdapter;
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.UserEntity;
 import com.mobcom.carrental.models.AdminProvider;
+import com.mobcom.carrental.utils.ReportService;
+import com.mobcom.carrental.utils.ReviewService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +54,7 @@ public class AdminProvidersFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        // loadDummyData(); // Load from database instead
+        loadProvidersFromDatabase();
         filterAndShow();
     }
 
@@ -118,6 +122,83 @@ public class AdminProvidersFragment extends Fragment
             rvProviders.setVisibility(View.VISIBLE);
             layoutEmpty.setVisibility(View.GONE);
         }
+    }
+
+    private void loadProvidersFromDatabase() {
+        // Load providers from database
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+        List<UserEntity> userEntities = db.userDao().getUsersByRole("PROVIDER");
+
+        allProviders.clear();
+        for (UserEntity entity : userEntities) {
+            // Get warning count
+            int warningCount = ReportService.getActiveWarningCount(entity.email);
+
+            // Determine trust level based on warnings
+            AdminProvider.TrustLevel trustLevel = AdminProvider.TrustLevel.TRUSTED;
+            if (ReportService.isSuspended(entity.email)) {
+                trustLevel = AdminProvider.TrustLevel.SUSPENDED;
+            } else if (warningCount > 2) {
+                trustLevel = AdminProvider.TrustLevel.FLAGGED;
+            } else if (warningCount > 0) {
+                trustLevel = AdminProvider.TrustLevel.PROBATION;
+            }
+
+            // Get average rating
+            double avgRating = ReviewService.getAverageProviderRating(entity.userId);
+
+            // Count total listings
+            int totalListings = db.carDao().getCarsByProvider(entity.userId).size();
+
+            // Count approved listings
+            int approvedListings = db.carDao()
+                    .getProviderCarsByApprovalStatus(entity.userId, "APPROVED").size();
+
+            // Count total bookings
+            int totalBookings = db.bookingDao().getProviderBookings(entity.userId).size();
+
+            // Count completed bookings
+            int completedBookings = (int) db.rentalDao()
+                    .getProviderRentals(entity.userId)
+                    .stream()
+                    .filter(r -> "COMPLETED".equalsIgnoreCase(r.status))
+                    .count();
+
+            // Calculate total earnings
+            double totalEarnings = 0;
+            for (Object rental : db.rentalDao().getProviderRentals(entity.userId)) {
+                com.mobcom.carrental.database.entities.RentalEntity r =
+                        (com.mobcom.carrental.database.entities.RentalEntity) rental;
+                if ("COMPLETED".equalsIgnoreCase(r.status)) {
+                    totalEarnings += r.totalCost;
+                }
+            }
+
+            AdminProvider provider = new AdminProvider(
+                    entity.userId,
+                    entity.fullName,
+                    entity.email,
+                    entity.phone != null ? entity.phone : "",
+                    entity.address != null ? entity.address : "",
+                    formatDate(entity.createdAt),
+                    trustLevel,
+                    totalListings,
+                    approvedListings,
+                    totalBookings,
+                    completedBookings,
+                    warningCount,
+                    (float) avgRating,
+                    (int) totalEarnings,
+                    totalBookings > 0 ? (int) (((totalBookings - completedBookings) / (float) totalBookings) * 100) : 0,
+                    ""  // vulnerabilityFlag
+            );
+            allProviders.add(provider);
+        }
+    }
+
+    private String formatDate(long timestamp) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM yyyy", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date(timestamp));
     }
 
     private void loadDummyData() {

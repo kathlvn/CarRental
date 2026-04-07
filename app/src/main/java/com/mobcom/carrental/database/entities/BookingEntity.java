@@ -2,6 +2,7 @@ package com.mobcom.carrental.database.entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "bookings")
@@ -27,11 +28,15 @@ public class BookingEntity {
     public long cancelledAt;
     public String cancellationReason;
     public String rentalId;
+    public String customerName;      // Denormalized for display
+    public String customerPhone;     // Denormalized for display
+    public String carPlateNumber;    // Denormalized for display
 
     public BookingEntity() {
         this.bookingId = "";
     }
 
+    @Ignore
     public BookingEntity(@NonNull String bookingId, String customerId, String carId, String providerId,
                          String startDate, String endDate, int totalDays, double dailyRate,
                          String status, String paymentMethod) {

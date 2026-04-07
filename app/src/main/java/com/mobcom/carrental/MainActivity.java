@@ -7,6 +7,10 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.mobcom.carrental.utils.BookingService;
+import com.mobcom.carrental.utils.DatabaseChatStore;
+import com.mobcom.carrental.utils.ReviewService;
+import com.mobcom.carrental.utils.ReportService;
 import com.mobcom.carrental.utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,7 +19,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabaseInitializer.initializeDatabase(this);
+        // Initialize all services
+        DatabaseChatStore.initialize(this);
+        BookingService.initialize(this);
+        ReviewService.initialize(this);
+        ReportService.initialize(this);
+
+//        DatabaseInitializer.initializeDatabase(this);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);

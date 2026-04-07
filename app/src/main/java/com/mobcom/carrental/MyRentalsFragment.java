@@ -17,10 +17,13 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.RentalAdapter;
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.RentalEntity;
+import com.mobcom.carrental.database.entities.RentalReviewEntity;
 import com.mobcom.carrental.models.Rental;
 import com.mobcom.carrental.models.RentalReview;
 import com.mobcom.carrental.utils.NotificationStore;
-import com.mobcom.carrental.utils.ReviewStore;
+import com.mobcom.carrental.utils.ReviewService;
 import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +62,7 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
         setupTabs();
         setupRecyclerView();
-        // loadDummyData(); // Load from database instead
+        loadRentalsFromDatabase();
 
         int initialTab = 0;
         Bundle args = getArguments();
@@ -159,7 +162,45 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
         }
     }
 
-    // ── Dummy data (replace with real API/DB later) ──────────────────────────
+    private void loadRentalsFromDatabase() {
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String customerId = sessionManager.getEmail();
+
+        // Load rentals from database
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+        List<RentalEntity> rentalEntities = db.rentalDao().getCustomerRentals(customerId);
+
+        allRentals.clear();
+        for (RentalEntity entity : rentalEntities) {
+            Rental.Status status;
+            try {
+                status = Rental.Status.valueOf(entity.status);
+            } catch (IllegalArgumentException e) {
+                status = Rental.Status.ACTIVE;
+            }
+
+            Rental rental = new Rental(
+                    entity.rentalId,
+                    entity.carName != null ? entity.carName : "Unknown Car",
+                    entity.carImageUrl != null ? entity.carImageUrl : "",
+                    entity.carPlateNumber != null ? entity.carPlateNumber : "N/A",
+                    entity.pickupLocation != null ? entity.pickupLocation : "",
+                    entity.startDate,
+                    entity.endDate,
+                    entity.totalDays,
+                    entity.totalCost,
+                    status,
+                    entity.providerName != null ? entity.providerName : "Unknown Provider"
+            );
+            allRentals.add(rental);
+        }
+
+        // Fallback to dummy data if no rentals found
+        if (allRentals.isEmpty()) {
+            loadDummyData();
+        }
+    }
+
     private void loadDummyData() {
         allRentals.add(new Rental("BK001", "Toyota Vios 2023",
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
@@ -235,7 +276,7 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
 
     @Override
     public void onRateReview(Rental rental) {
-        RentalReview existing = ReviewStore.getReview(rental.getRentalId());
+        RentalReviewEntity existing = ReviewService.getReviewForRental(rental.getRentalId());
         if (existing != null) {
             Toast.makeText(requireContext(), "You already reviewed this rental", Toast.LENGTH_SHORT).show();
             filterAndShow(currentTab);
@@ -243,7 +284,24 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
         }
 
         ReviewDialogHelper.show(requireContext(), rental.getCarName(), review -> {
-            ReviewStore.saveReview(rental.getRentalId(), review);
+            // Get rental entity to extract providerId
+            AppDatabase db = AppDatabase.getInstance(requireContext());
+            RentalEntity rentalEntity = db.rentalDao().getRentalById(rental.getRentalId());
+
+            if (rentalEntity != null) {
+                SessionManager sessionManager = new SessionManager(requireContext());
+                String customerId = sessionManager.getEmail();
+
+                ReviewService.saveReview(
+                        rental.getRentalId(),
+                        customerId,
+                        rentalEntity.providerId,
+                        review.getProviderRating(),
+                        review.getCarRating(),
+                        review.getComment()
+                );
+            }
+
             Toast.makeText(requireContext(), "Thanks for your review!", Toast.LENGTH_SHORT).show();
             filterAndShow(currentTab);
         });

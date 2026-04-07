@@ -19,7 +19,7 @@ import com.mobcom.carrental.adapters.ChatMessageAdapter;
 import com.mobcom.carrental.adapters.ConversationListAdapter;
 import com.mobcom.carrental.models.ChatMessage;
 import com.mobcom.carrental.models.Conversation;
-import com.mobcom.carrental.utils.ChatMemoryStore;
+import com.mobcom.carrental.utils.DatabaseChatStore;
 import com.mobcom.carrental.utils.SessionManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +106,8 @@ public class MessagesFragment extends Fragment {
             }
 
             String name = sessionManager.getName().isEmpty() ? "Customer" : sessionManager.getName();
-            ChatMemoryStore.sendMessage(threadId, SessionManager.ROLE_CUSTOMER, name, text);
+            String userId = sessionManager.getEmail(); // Use email as unique user ID
+            DatabaseChatStore.sendMessage(threadId, SessionManager.ROLE_CUSTOMER, userId, name, text);
             etMessage.setText("");
             refreshMessages();
         });
@@ -133,11 +134,12 @@ public class MessagesFragment extends Fragment {
     }
 
     private void refreshConversationsList() {
-        List<String> threadIds = ChatMemoryStore.getAllThreadIds();
+        String userId = sessionManager.getEmail();
+        List<String> threadIds = DatabaseChatStore.getUserThreadIds(userId);
         List<Conversation> conversations = new ArrayList<>();
 
         for (String id : threadIds) {
-            ChatMessage lastMsg = ChatMemoryStore.getLastMessage(id);
+            ChatMessage lastMsg = DatabaseChatStore.getLastMessage(id);
             if (lastMsg != null) {
                 String peerName = extractPeerNameFromThread(id, lastMsg);
                 conversations.add(new Conversation(
@@ -168,7 +170,7 @@ public class MessagesFragment extends Fragment {
     }
 
     private void refreshMessages() {
-        List<ChatMessage> items = ChatMemoryStore.getThreadMessages(threadId);
+        List<ChatMessage> items = DatabaseChatStore.getThreadMessages(threadId);
         adapter.submitList(items);
         if (!items.isEmpty()) {
             rvMessages.scrollToPosition(items.size() - 1);

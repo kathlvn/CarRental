@@ -30,6 +30,9 @@ import com.mobcom.carrental.adapters.CarImageAdapter;
 import com.mobcom.carrental.models.CarFormData;
 import com.mobcom.carrental.models.ProviderCar;
 import com.mobcom.carrental.utils.CarBrandData;
+import com.mobcom.carrental.utils.CarService;
+import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.entities.CarEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -367,27 +370,43 @@ public class AddEditCarFragment extends Fragment {
     // ── Submit ───────────────────────────────────────────────────────────────
 
     private void submitForm() {
-        // Collect form data
-        formData.setBrand(actvBrand.getText().toString());
-        formData.setModel(actvModel.getText().toString());
-        formData.setCustomModel(etCustomModel.getText().toString());
-        formData.setCustomBrand(etCustomBrand.getText().toString());
-        formData.setYear(Integer.parseInt(actvYear.getText().toString()));
-        formData.setCarType(actvCarType.getText().toString());
-        formData.setTransmission(actvTransmission.getText().toString());
-        formData.setFuelType(actvFuelType.getText().toString());
-        formData.setSeats(Integer.parseInt(actvSeats.getText().toString()));
-        formData.setPricePerDay(Double.parseDouble(etPrice.getText().toString()));
-        formData.setPlateNumber(etPlate.getText().toString());
-        formData.setLocation(etLocation.getText().toString());
-        formData.setOrNumber(etOrNumber.getText().toString());
-        formData.setCrNumber(etCrNumber.getText().toString());
-        formData.setAlwaysAvailable(switchAlwaysAvailable.isChecked());
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String providerId = sessionManager.getEmail();
+        String carName = actvBrand.getText().toString() + " " + actvModel.getText().toString();
 
+        if (isEditMode && existingCar != null) {
+            // Update existing car
+            CarEntity car = CarService.getInstance().getCarById(existingCar.getCarId());
+            if (car != null) {
+                car.name = carName;
+                car.carType = actvCarType.getText().toString();
+                car.transmission = actvTransmission.getText().toString();
+                car.seats = Integer.parseInt(actvSeats.getText().toString());
+                car.fuelType = actvFuelType.getText().toString();
+                car.pricePerDay = Double.parseDouble(etPrice.getText().toString());
+                car.plateNumber = etPlate.getText().toString();
+                car.location = etLocation.getText().toString();
+                car.description = "";
+                CarService.getInstance().updateCar(car);
+            }
+        } else {
+            // Add new car - use first image as thumbnail
+            String imageUrl = selectedImages.isEmpty() ? "" : selectedImages.get(0).toString();
+            CarService.getInstance().addCar(
+                    providerId,
+                    carName,
+                    actvCarType.getText().toString(),
+                    actvTransmission.getText().toString(),
+                    Integer.parseInt(actvSeats.getText().toString()),
+                    actvFuelType.getText().toString(),
+                    Double.parseDouble(etPrice.getText().toString()),
+                    etPlate.getText().toString(),
+                    etLocation.getText().toString(),
+                    imageUrl,
+                    ""
+            );
+        }
 
-        Toast.makeText(requireContext(),
-                isEditMode ? "Changes saved locally" : "Listing saved locally",
-                Toast.LENGTH_SHORT).show();
         new com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(isEditMode ? "Listing Updated!" : "Listing Submitted!")
                 .setMessage(isEditMode

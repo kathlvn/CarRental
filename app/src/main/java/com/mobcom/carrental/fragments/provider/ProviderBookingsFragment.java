@@ -18,8 +18,12 @@ import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.ProviderBookingAdapter;
 import com.mobcom.carrental.models.ProviderBooking;
+import com.mobcom.carrental.utils.BookingService;
 import com.mobcom.carrental.utils.NotificationStore;
 import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.entities.BookingEntity;
+import com.mobcom.carrental.database.entities.CarEntity;
+import com.mobcom.carrental.database.AppDatabase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,7 +62,7 @@ public class ProviderBookingsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        // loadDummyData(); // Load from database instead
+        loadBookingsFromDatabase();
         filterAndShow(0);
         btnOpenMessages.setOnClickListener(v ->
             androidx.navigation.Navigation.findNavController(v)
@@ -149,36 +153,67 @@ public class ProviderBookingsFragment extends Fragment
         }
     }
 
-    // ── Dummy data ────────────────────────────────────────────────────────────
+    private void loadBookingsFromDatabase() {
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String providerId = sessionManager.getEmail();
 
-    private void loadDummyData() {
-        allBookings.add(new ProviderBooking(
-                "BK001", "Toyota Vios 2023", "ABC 1234",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
-                "Juan dela Cruz", "+63 912 345 6789",
-                "SM City Bacolod", "Jun 10, 2025", "Jun 13, 2025",
-                3, 4500, ProviderBooking.Status.PENDING, "2 hours ago"));
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+        java.util.List<BookingEntity> bookingEntities = db.bookingDao().getProviderBookings(providerId);
 
-        allBookings.add(new ProviderBooking(
-                "BK002", "Honda City 2022", "XYZ 5678",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
-                "Maria Santos", "+63 917 654 3210",
-                "Robinsons Bacolod", "Jun 15, 2025", "Jun 17, 2025",
-                2, 2400, ProviderBooking.Status.PENDING, "5 hours ago"));
+        allBookings.clear();
+        for (BookingEntity booking : bookingEntities) {
+            // Get car details
+            CarEntity car = db.carDao().getCarById(booking.carId);
+            String carName = car != null ? car.name : "Unknown Car";
+            String carImage = car != null ? car.imageUrl : "";
 
-        allBookings.add(new ProviderBooking(
-                "BK003", "Toyota Vios 2023", "ABC 1234",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
-                "Pedro Reyes", "+63 998 111 2222",
-                "Bacolod-Silay Airport", "May 1, 2025", "May 5, 2025",
-                4, 6000, ProviderBooking.Status.ACTIVE, "2 days ago"));
+            // Map booking status
+            ProviderBooking.Status status = mapBookingStatus(booking.status);
 
-        allBookings.add(new ProviderBooking(
-                "BK004", "Honda City 2022", "XYZ 5678",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
-                "Ana Reyes", "+63 921 999 8888",
-                "SM City Bacolod", "Apr 10, 2025", "Apr 12, 2025",
-                2, 2400, ProviderBooking.Status.COMPLETED, "3 weeks ago"));
+            ProviderBooking pb = new ProviderBooking(
+                    booking.bookingId,
+                    carName,
+                    booking.carPlateNumber != null ? booking.carPlateNumber : (car != null ? car.plateNumber : ""),
+                    carImage,
+                    booking.customerName != null ? booking.customerName : "Customer",
+                    booking.customerPhone != null ? booking.customerPhone : "",
+                    booking.pickupLocation != null ? booking.pickupLocation : "",
+                    booking.startDate,
+                    booking.endDate,
+                    booking.totalDays,
+                    booking.totalAmount,
+                    status,
+                    getTimeAgo(booking.createdAt)
+            );
+            allBookings.add(pb);
+        }
+    }
+
+    private ProviderBooking.Status mapBookingStatus(String status) {
+        if (status == null) return ProviderBooking.Status.PENDING;
+        switch (status) {
+            case "CONFIRMED": return ProviderBooking.Status.CONFIRMED;
+            case "ACTIVE": return ProviderBooking.Status.ACTIVE;
+            case "COMPLETED": return ProviderBooking.Status.COMPLETED;
+            case "REJECTED": return ProviderBooking.Status.REJECTED;
+            case "CANCELLED": return ProviderBooking.Status.CANCELLED;
+            default: return ProviderBooking.Status.PENDING;
+        }
+    }
+
+    private String getTimeAgo(long timestamp) {
+        long now = System.currentTimeMillis();
+        long diffMs = now - timestamp;
+        long diffSecs = diffMs / 1000;
+        long diffMins = diffSecs / 60;
+        long diffHours = diffMins / 60;
+        long diffDays = diffHours / 24;
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return diffMins + " min" + (diffMins > 1 ? "s" : "") + " ago";
+        if (diffHours < 24) return diffHours + " hour" + (diffHours > 1 ? "s" : "") + " ago";
+        if (diffDays < 7) return diffDays + " day" + (diffDays > 1 ? "s" : "") + " ago";
+        return "Long ago";
     }
 
     // ── OnBookingActionListener ───────────────────────────────────────────────
@@ -191,6 +226,9 @@ public class ProviderBookingsFragment extends Fragment
                         + " for " + booking.getCarName()
                         + " (" + booking.getStartDate() + " → " + booking.getEndDate() + ")")
                 .setPositiveButton("Accept", (dialog, which) -> {
+                    // Save to database
+                    BookingService.acceptBooking(booking.getBookingId());
+
                     NotificationStore.pushBookingStatusNotification(
                         requireContext(),
                         SessionManager.ROLE_CUSTOMER,
@@ -221,6 +259,9 @@ public class ProviderBookingsFragment extends Fragment
                 .setTitle("Reject Booking")
                 .setMessage("Select a reason for rejection:")
                 .setItems(reasons, (dialog, which) -> {
+                    // Save to database
+                    BookingService.rejectBooking(booking.getBookingId(), reasons[which]);
+
                     NotificationStore.pushBookingStatusNotification(
                             requireContext(),
                             SessionManager.ROLE_CUSTOMER,

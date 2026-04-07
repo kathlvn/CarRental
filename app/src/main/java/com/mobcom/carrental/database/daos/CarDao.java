@@ -36,6 +36,9 @@ public interface CarDao {
     @Query("SELECT * FROM cars")
     List<CarEntity> getAllCars();
 
+    @Query("SELECT * FROM cars WHERE isAvailable = 1 AND approvalStatus = 'APPROVED'")
+    List<CarEntity> getApprovedAvailableCars();
+
     @Query("SELECT * FROM cars WHERE carType = :carType AND isAvailable = 1")
     List<CarEntity> getCarsByType(String carType);
 
@@ -50,6 +53,12 @@ public interface CarDao {
 
     @Query("SELECT * FROM cars WHERE rating >= :minRating AND isAvailable = 1 ORDER BY rating DESC")
     List<CarEntity> getTopRatedCars(double minRating);
+
+    @Query("SELECT * FROM cars WHERE approvalStatus = :status")
+    List<CarEntity> getCarsByApprovalStatus(String status);
+
+    @Query("SELECT * FROM cars WHERE approvalStatus = :status AND providerId = :providerId")
+    List<CarEntity> getProviderCarsByApprovalStatus(String providerId, String status);
 
     @Query("DELETE FROM cars")
     void deleteAllCars();

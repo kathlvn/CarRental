@@ -22,7 +22,7 @@ import com.mobcom.carrental.models.Rental;
 import com.mobcom.carrental.models.RentalReview;
 import com.mobcom.carrental.utils.BookingApiClient;
 import com.mobcom.carrental.utils.NotificationStore;
-import com.mobcom.carrental.utils.ReviewStore;
+import com.mobcom.carrental.utils.ReviewService;
 import com.mobcom.carrental.utils.SessionManager;
 
 public class RentalDetailFragment extends Fragment {
@@ -205,14 +205,21 @@ public class RentalDetailFragment extends Fragment {
                 });
                 break;
             case COMPLETED:
-                RentalReview existingReview = ReviewStore.getReview(rental.getRentalId());
-                if (existingReview == null) {
+                if (!ReviewService.hasReview(rental.getRentalId())) {
                     btnPrimary.setText("Rate & Review");
                     btnPrimary.setOnClickListener(v -> ReviewDialogHelper.show(
                             requireContext(),
                             rental.getCarName(),
                             review -> {
-                                ReviewStore.saveReview(rental.getRentalId(), review);
+                                SessionManager sessionManager = new SessionManager(requireContext());
+                                ReviewService.saveReview(
+                                        rental.getRentalId(),
+                                        sessionManager.getEmail(),  // customerId
+                                        "provider123",              // TODO: Get from rental entity
+                                        review.getProviderRating(),
+                                        review.getCarRating(),
+                                        review.getComment()
+                                );
                                 Toast.makeText(requireContext(), "Thanks for your review!", Toast.LENGTH_SHORT).show();
                                 setupActionButtons();
                             }

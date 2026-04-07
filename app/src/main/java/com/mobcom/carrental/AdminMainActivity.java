@@ -9,6 +9,10 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.mobcom.carrental.utils.BookingService;
+import com.mobcom.carrental.utils.DatabaseChatStore;
+import com.mobcom.carrental.utils.ReviewService;
+import com.mobcom.carrental.utils.ReportService;
 import com.mobcom.carrental.utils.SessionManager;
 import com.mobcom.carrental.database.DatabaseInitializer;
 
@@ -21,6 +25,12 @@ public class AdminMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
+
+        // Initialize all services
+        DatabaseChatStore.initialize(this);
+        BookingService.initialize(this);
+        ReviewService.initialize(this);
+        ReportService.initialize(this);
 
         DatabaseInitializer.initializeDatabase(this);
 

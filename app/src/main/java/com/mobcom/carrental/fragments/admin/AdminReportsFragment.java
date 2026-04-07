@@ -15,7 +15,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.AdminReportAdapter;
+import com.mobcom.carrental.database.entities.ReportEntity;
 import com.mobcom.carrental.models.AdminReport;
+import com.mobcom.carrental.utils.ReportService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +55,7 @@ public class AdminReportsFragment extends Fragment
 
         setupTabs();
         setupRecyclerView();
-        // loadDummyData(); // Load from database instead
+        loadReportsFromDatabase();
         filterAndShow();
         updateOpenBadge();
     }
@@ -165,6 +167,58 @@ public class AdminReportsFragment extends Fragment
         }
     }
 
+    private void loadReportsFromDatabase() {
+        // Load reports from database
+        List<ReportEntity> reportEntities = ReportService.getOpenReports();
+
+        allReports.clear();
+        for (ReportEntity entity : reportEntities) {
+            AdminReport.Status status;
+            try {
+                status = AdminReport.Status.valueOf(entity.status);
+            } catch (IllegalArgumentException e) {
+                status = AdminReport.Status.OPEN;
+            }
+
+            AdminReport.Severity severity;
+            try {
+                severity = AdminReport.Severity.valueOf(entity.severity);
+            } catch (IllegalArgumentException e) {
+                severity = AdminReport.Severity.MEDIUM;
+            }
+
+            AdminReport.Category category;
+            try {
+                category = AdminReport.Category.valueOf(entity.category);
+            } catch (IllegalArgumentException e) {
+                category = AdminReport.Category.OTHER;
+            }
+
+            AdminReport report = new AdminReport(
+                    entity.reportId,
+                    category,
+                    severity,
+                    status,
+                    entity.title,
+                    entity.description,
+                    entity.reporterName,
+                    entity.reportedName,
+                    entity.reportedId,
+                    java.text.SimpleDateFormat.getDateInstance()
+                            .format(new java.util.Date(entity.createdAt))
+            );
+            if (!entity.resolution.isEmpty()) {
+                report.setResolution(entity.resolution);
+            }
+            allReports.add(report);
+        }
+
+        // Fallback to dummy data if no reports found
+        if (allReports.isEmpty()) {
+            loadDummyData();
+        }
+    }
+
     private void loadDummyData() {
         allReports.add(new AdminReport(
                 "RPT001",
@@ -227,6 +281,7 @@ public class AdminReportsFragment extends Fragment
                 .setTitle("Dismiss Report?")
                 .setMessage("Are you sure this report does not require action?")
                 .setPositiveButton("Dismiss", (dialog, which) -> {
+                    ReportService.dismissReport(report.getReportId());
                     report.setStatus(AdminReport.Status.DISMISSED);
                     report.setResolution("Report dismissed — no violation found.");
                     filterAndShow();
@@ -243,6 +298,7 @@ public class AdminReportsFragment extends Fragment
                 .setMessage("This will flag the report as high priority. "
                         + "The provider may be temporarily restricted.")
                 .setPositiveButton("Escalate", (dialog, which) -> {
+                    ReportService.escalateReport(report.getReportId(), "Admin escalation");
                     report.setStatus(AdminReport.Status.ESCALATED);
                     filterAndShow();
                     updateOpenBadge();
@@ -265,6 +321,7 @@ public class AdminReportsFragment extends Fragment
                 .setTitle("Resolve Report")
                 .setMessage("Select the action taken:")
                 .setItems(actions, (dialog, which) -> {
+                    ReportService.updateReportResolution(report.getReportId(), "RESOLVED", actions[which], "");
                     report.setStatus(AdminReport.Status.RESOLVED);
                     report.setResolution(actions[which]);
                     filterAndShow();

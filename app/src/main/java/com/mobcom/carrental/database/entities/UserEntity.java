@@ -2,6 +2,7 @@ package com.mobcom.carrental.database.entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "users")
@@ -26,6 +27,7 @@ public class UserEntity {
 
     public UserEntity() {}
 
+    @Ignore
     public UserEntity(@NonNull String userId, String fullName, String email, String phone,
                       String role, String verificationStatus) {
         this.userId = userId;

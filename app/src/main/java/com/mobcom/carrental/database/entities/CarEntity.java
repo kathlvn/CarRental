@@ -2,6 +2,7 @@ package com.mobcom.carrental.database.entities;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "cars")
@@ -26,9 +27,13 @@ public class CarEntity {
     public int totalRentals;
     public long lastMaintenanceDate;
     public double distanceKm;
+    public long updatedAt;
+    public String approvalStatus;    // PENDING_REVIEW, APPROVED, REJECTED
+    public String rejectionReason;   // For rejected listings
 
     public CarEntity() {}
 
+    @Ignore
     public CarEntity(@NonNull String carId, String providerId, String name, String carType,
                      String transmission, int seats, String fuelType, double pricePerDay,
                      double rating, String plateNumber, String location, String imageUrl,

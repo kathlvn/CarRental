@@ -19,6 +19,10 @@ import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.ProviderBookingAdapter;
 import com.mobcom.carrental.models.ProviderBooking;
 import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.BookingEntity;
+import com.mobcom.carrental.database.entities.CarEntity;
+import com.mobcom.carrental.database.entities.RentalEntity;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -90,6 +94,14 @@ public class ProviderDashboardFragment extends Fragment
             displayedMonth.add(Calendar.MONTH, 1);
             buildCalendar();
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh stats and pending bookings when returning to dashboard
+        updateStats();
+        updatePendingList();
     }
 
     private void bindViews(View view) {
@@ -179,22 +191,90 @@ public class ProviderDashboardFragment extends Fragment
     // ── Stats ─────────────────────────────────────────────────────────────────
 
     private void updateStats() {
-        tvTotalEarnings.setText("₱12,400");
-        tvActiveRentals.setText("1");
-        tvPendingCount.setText(String.valueOf(pendingBookings.size()));
-        tvTotalCars.setText("3");
+        SessionManager session = new SessionManager(requireContext());
+        String providerId = session.getEmail();
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+
+        // Get total cars
+        List<CarEntity> cars = db.carDao().getCarsByProvider(providerId);
+        tvTotalCars.setText(cars.size() + "");
+
+        // Get bookings for this provider
+        List<BookingEntity> bookings = db.bookingDao().getProviderBookings(providerId);
+
+        // Calculate earnings from completed rentals
+        double totalEarnings = 0;
+        List<RentalEntity> rentals = db.rentalDao().getProviderRentals(providerId);
+        for (RentalEntity rental : rentals) {
+            if ("COMPLETED".equalsIgnoreCase(rental.status)) {
+                totalEarnings += rental.totalCost;
+            }
+        }
+        tvTotalEarnings.setText("₱" + String.format("%,.0f", totalEarnings));
+
+        // Count active rentals (ACTIVE status)
+        int activeCount = 0;
+        for (RentalEntity rental : rentals) {
+            if ("ACTIVE".equalsIgnoreCase(rental.status)) {
+                activeCount++;
+            }
+        }
+        tvActiveRentals.setText(activeCount + "");
+
+        // Count pending bookings
+        int pendingCount = 0;
+        for (BookingEntity booking : bookings) {
+            if ("PENDING".equalsIgnoreCase(booking.status)) {
+                pendingCount++;
+            }
+        }
+        tvPendingCount.setText(pendingCount + "");
 
         // Notification badge
-        if (!pendingBookings.isEmpty()) {
+        if (pendingCount > 0) {
             tvNotifBadge.setVisibility(View.VISIBLE);
-            tvNotifBadge.setText(pendingBookings.size() + " new");
+            tvNotifBadge.setText(pendingCount + " new");
             tvNotifBadge.getBackground().setTint(Color.parseColor("#FF9800"));
+        } else {
+            tvNotifBadge.setVisibility(View.GONE);
         }
     }
 
     // ── Pending List ──────────────────────────────────────────────────────────
 
     private void updatePendingList() {
+        SessionManager session = new SessionManager(requireContext());
+        String providerId = session.getEmail();
+        AppDatabase db = AppDatabase.getInstance(requireContext());
+
+        pendingBookings.clear();
+        List<BookingEntity> bookingEntities = db.bookingDao().getProviderBookings(providerId);
+
+        for (BookingEntity booking : bookingEntities) {
+            if ("PENDING".equalsIgnoreCase(booking.status)) {
+                CarEntity car = db.carDao().getCarById(booking.carId);
+                String carName = car != null ? car.name : "Unknown Car";
+                String carImage = car != null ? car.imageUrl : "";
+
+                ProviderBooking pb = new ProviderBooking(
+                        booking.bookingId,
+                        carName,
+                        booking.carPlateNumber != null ? booking.carPlateNumber : "",
+                        carImage,
+                        booking.customerName != null ? booking.customerName : "Customer",
+                        booking.customerPhone != null ? booking.customerPhone : "",
+                        booking.pickupLocation != null ? booking.pickupLocation : "",
+                        booking.startDate,
+                        booking.endDate,
+                        booking.totalDays,
+                        booking.totalAmount,
+                        ProviderBooking.Status.PENDING,
+                        getTimeAgo(booking.createdAt)
+                );
+                pendingBookings.add(pb);
+            }
+        }
+
         if (pendingBookings.isEmpty()) {
             rvPendingBookings.setVisibility(View.GONE);
             layoutNoPending.setVisibility(View.VISIBLE);
@@ -203,6 +283,21 @@ public class ProviderDashboardFragment extends Fragment
             layoutNoPending.setVisibility(View.GONE);
             adapter.updateList(pendingBookings);
         }
+    }
+
+    private String getTimeAgo(long timestamp) {
+        long now = System.currentTimeMillis();
+        long diffMs = now - timestamp;
+        long diffSecs = diffMs / 1000;
+        long diffMins = diffSecs / 60;
+        long diffHours = diffMins / 60;
+        long diffDays = diffHours / 24;
+
+        if (diffMins < 1) return "Just now";
+        if (diffMins < 60) return diffMins + " min" + (diffMins > 1 ? "s" : "") + " ago";
+        if (diffHours < 24) return diffHours + " hour" + (diffHours > 1 ? "s" : "") + " ago";
+        if (diffDays < 7) return diffDays + " day" + (diffDays > 1 ? "s" : "") + " ago";
+        return "Long ago";
     }
 
     // ── Calendar ──────────────────────────────────────────────────────────────

@@ -19,6 +19,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.models.Booking;
 import com.mobcom.carrental.Car;
+import com.mobcom.carrental.utils.BookingService;
+import com.mobcom.carrental.utils.SessionManager;
 import java.util.UUID;
 
 public class BookingFormFragment extends Fragment {
@@ -184,6 +186,33 @@ public class BookingFormFragment extends Fragment {
         String bookingId = "BK" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         String note      = etNote.getText() != null ? etNote.getText().toString().trim() : "";
 
+        // Save booking to database
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String customerId = sessionManager.getEmail();
+
+        // Check if customer is suspended
+        if (BookingService.isCustomerSuspended(customerId)) {
+            Toast.makeText(requireContext(),
+                    "Your account is suspended and cannot make bookings. Contact support for details.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        BookingService.saveBooking(
+                bookingId,
+                customerId,
+                car.getId(),
+                car.getProviderId(),
+                startDate,
+                endDate,
+                totalDays,
+                car.getPricePerDay(),
+                etPickupLocation.getText().toString(),
+                note,
+                selectedPayment.toString()
+        );
+
+        // Create in-memory Booking for UI navigation
         Booking booking = new Booking(
                 bookingId,
                 car.getId(),

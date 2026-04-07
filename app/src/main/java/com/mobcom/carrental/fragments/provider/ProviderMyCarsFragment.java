@@ -17,6 +17,9 @@ import com.google.android.material.tabs.TabLayout;
 import com.mobcom.carrental.R;
 import com.mobcom.carrental.adapters.ProviderCarAdapter;
 import com.mobcom.carrental.models.ProviderCar;
+import com.mobcom.carrental.utils.CarService;
+import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.entities.CarEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,13 +56,21 @@ public class ProviderMyCarsFragment extends Fragment implements ProviderCarAdapt
 
         setupTabs();
         setupRecyclerView();
-        loadDummyData();
+        loadCarsFromDatabase();
         filterAndShow(0);
 
         fabAddCar.setOnClickListener(v ->
                 androidx.navigation.Navigation.findNavController(v)
                         .navigate(R.id.action_myCars_to_addEditCar)
         );
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh car listings when returning to this fragment
+        loadCarsFromDatabase();
+        filterAndShow(currentTab);
     }
 
     private void setupTabs() {
@@ -117,24 +128,44 @@ public class ProviderMyCarsFragment extends Fragment implements ProviderCarAdapt
         }
     }
 
-    private void loadDummyData() {
-        allCars.add(new ProviderCar("CAR001", "Toyota", "Vios", 2023,
-                "ABC 1234", "Automatic", "Gasoline", 5, "Sedan",
-                1500, "Bacolod City",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg/1280px-2023_Toyota_Vios_1.5_G_CVT_%28facelift%2C_white%29%2C_front_8.24.22.jpg",
-                ProviderCar.Status.ACTIVE, 4.8f, 12));
+    private void loadCarsFromDatabase() {
+        SessionManager sessionManager = new SessionManager(requireContext());
+        String providerId = sessionManager.getEmail();
 
-        allCars.add(new ProviderCar("CAR002", "Honda", "City", 2022,
-                "XYZ 5678", "Manual", "Gasoline", 5, "Sedan",
-                1200, "Bacolod City",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg/1280px-2021_Honda_City_1.0_V_Turbo_CVT_%28Philippines%29%2C_front_8.19.21.jpg",
-                ProviderCar.Status.ACTIVE, 4.5f, 8));
+        allCars.clear();
+        java.util.List<CarEntity> carEntities = CarService.getInstance().getProviderCars(providerId);
 
-        allCars.add(new ProviderCar("CAR003", "Mitsubishi", "Xpander", 2022,
-                "DEF 9012", "Automatic", "Gasoline", 7, "Van",
-                2000, "Bacolod City",
-                "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg/1280px-2022_Mitsubishi_Xpander_GLS_Sport_AT_%28Philippines%29%2C_front_11.6.22.jpg",
-                ProviderCar.Status.INACTIVE, 0f, 0));
+        for (CarEntity entity : carEntities) {
+            ProviderCar.Status status;
+            if ("REJECTED".equals(entity.approvalStatus)) {
+                status = ProviderCar.Status.INACTIVE;
+            } else if ("PENDING".equals(entity.approvalStatus) || entity.approvalStatus == null) {
+                status = ProviderCar.Status.PENDING_REVIEW;
+            } else if ("APPROVED".equals(entity.approvalStatus)) {
+                status = entity.isAvailable ? ProviderCar.Status.ACTIVE : ProviderCar.Status.INACTIVE;
+            } else {
+                status = entity.isAvailable ? ProviderCar.Status.ACTIVE : ProviderCar.Status.INACTIVE;
+            }
+
+            ProviderCar car = new ProviderCar(
+                    entity.carId,
+                    entity.name.split(" ")[0],  // Brand
+                    entity.name.split(" ").length > 1 ? entity.name.split(" ")[1] : "",  // Model
+                    2025,  // Year (would need to store this)
+                    entity.plateNumber,
+                    entity.transmission,
+                    entity.fuelType,
+                    entity.seats,
+                    entity.carType,
+                    entity.pricePerDay,
+                    entity.location,
+                    entity.imageUrl,
+                    status,
+                    (float) entity.rating,
+                    entity.totalRentals
+            );
+            allCars.add(car);
+        }
     }
 
     // ── ProviderCarAdapter.OnCarActionListener ────────────────────────────────
@@ -158,6 +189,9 @@ public class ProviderMyCarsFragment extends Fragment implements ProviderCarAdapt
                         ? "This car will no longer appear in search results."
                         : "This car will be visible to customers again.")
                 .setPositiveButton("Confirm", (dialog, which) -> {
+                    // Update in database
+                    CarService.getInstance().toggleCarAvailability(car.getCarId());
+
                     car.setStatus(car.getStatus() == ProviderCar.Status.ACTIVE
                             ? ProviderCar.Status.INACTIVE
                             : ProviderCar.Status.ACTIVE);

@@ -187,9 +187,9 @@ public class ExploreFragment extends Fragment {
     private void loadCarsFromDatabase() {
         try {
             AppDatabase db = AppDatabase.getInstance(requireContext());
-            List<CarEntity> cars = db.carDao().getAvailableCars();
+            List<CarEntity> cars = db.carDao().getApprovedAvailableCars();
 
-            android.util.Log.d("ExploreFragment", "Loaded " + cars.size() + " available cars from database");
+            android.util.Log.d("ExploreFragment", "Loaded " + cars.size() + " approved cars from database");
             for (CarEntity car : cars) {
                 android.util.Log.d("ExploreFragment", "  - " + car.name + " from provider " + car.providerId);
             }
