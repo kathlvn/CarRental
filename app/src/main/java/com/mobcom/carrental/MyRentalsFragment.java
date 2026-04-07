@@ -55,7 +55,21 @@ public class MyRentalsFragment extends Fragment implements RentalAdapter.OnRenta
         setupTabs();
         setupRecyclerView();
         loadDummyData();
-        filterAndShow(0);
+
+        int initialTab = 0;
+        Bundle args = getArguments();
+        if (args != null) {
+            int requestedTab = args.getInt("initialTab", 0);
+            if (requestedTab >= 0 && requestedTab <= 2) {
+                initialTab = requestedTab;
+            }
+        }
+
+        filterAndShow(initialTab);
+        TabLayout.Tab tab = tabLayout.getTabAt(initialTab);
+        if (tab != null) {
+            tab.select();
+        }
 
         btnExplore.setOnClickListener(v -> {
             // Navigate to Explore tab (index 0 in bottom nav)
