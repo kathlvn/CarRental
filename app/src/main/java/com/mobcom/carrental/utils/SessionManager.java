@@ -13,6 +13,7 @@ public class SessionManager {
     private static final String KEY_USER_ID  = "userId";
     private static final String KEY_NAME     = "userName";
     private static final String KEY_EMAIL    = "userEmail";
+    private static final String KEY_NOTIFICATIONS_ENABLED = "notificationsEnabled";
 
     public static final String ROLE_CUSTOMER = "CUSTOMER";
     public static final String ROLE_PROVIDER = "PROVIDER";
@@ -60,6 +61,37 @@ public class SessionManager {
     public String getUserId()  { return prefs.getString(KEY_USER_ID, ""); }
     public String getName()    { return prefs.getString(KEY_NAME, ""); }
     public String getEmail()   { return prefs.getString(KEY_EMAIL, ""); }
+
+    private String getNotificationsKeyForRole(String role) {
+        String safeRole = role == null ? "" : role.trim();
+        if (safeRole.isEmpty()) {
+            safeRole = "GLOBAL";
+        }
+        return KEY_NOTIFICATIONS_ENABLED + "_" + safeRole;
+    }
+
+    public boolean isNotificationsEnabledForRole(String role) {
+        return prefs.getBoolean(getNotificationsKeyForRole(role), true);
+    }
+
+    public void setNotificationsEnabledForRole(String role, boolean enabled) {
+        editor.putBoolean(getNotificationsKeyForRole(role), enabled);
+        editor.apply();
+    }
+
+    public boolean isNotificationsEnabled() {
+        return isNotificationsEnabledForRole(getRole());
+    }
+
+    public void setNotificationsEnabled(boolean enabled) {
+        setNotificationsEnabledForRole(getRole(), enabled);
+    }
+
+    public void updateProfile(String name, String email) {
+        editor.putString(KEY_NAME, name == null ? "" : name.trim());
+        editor.putString(KEY_EMAIL, email == null ? "" : email.trim());
+        editor.apply();
+    }
 
     // ── Logout ───────────────────────────────────────────────────────────────
 

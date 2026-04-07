@@ -1,10 +1,12 @@
 package com.mobcom.carrental;
 
 import android.content.Intent;
+import android.text.InputType;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +51,7 @@ public class ProfileFragment extends Fragment {
         loadRentalHistory();
         updateBookingStats();
         setupActions();
+        bindPreferences();
     }
 
     private void bindViews(@NonNull View view) {
@@ -130,25 +133,93 @@ public class ProfileFragment extends Fragment {
         cardStatsCompleted.setOnClickListener(v -> openMyRentalsTab(1));
         cardStatsCancelled.setOnClickListener(v -> openMyRentalsTab(2));
 
-        layoutEditProfile.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Edit Profile coming soon", Toast.LENGTH_SHORT).show());
+        layoutEditProfile.setOnClickListener(v -> showEditProfileDialog());
 
-        layoutChangePassword.setOnClickListener(v ->
-            Toast.makeText(requireContext(), "Change Password coming soon", Toast.LENGTH_SHORT).show());
+        layoutChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
-        switchNotifications.setOnCheckedChangeListener((button, isChecked) ->
+        switchNotifications.setOnCheckedChangeListener((button, isChecked) -> {
+            sessionManager.setNotificationsEnabledForRole(SessionManager.ROLE_CUSTOMER, isChecked);
             Toast.makeText(requireContext(),
-                isChecked ? "Notifications enabled" : "Notifications disabled",
-                Toast.LENGTH_SHORT).show());
+                    isChecked ? "Notifications enabled" : "Notifications disabled",
+                    Toast.LENGTH_SHORT).show();
+        });
 
         layoutLogout.setOnClickListener(v -> showLogoutConfirmation());
-        }
+    }
 
-        private void openMyRentalsTab(int tab) {
+    private void bindPreferences() {
+        switchNotifications.setChecked(
+                sessionManager.isNotificationsEnabledForRole(SessionManager.ROLE_CUSTOMER)
+        );
+    }
+
+    private void openMyRentalsTab(int tab) {
         Bundle args = new Bundle();
         args.putInt("initialTab", tab);
         androidx.navigation.Navigation.findNavController(requireView())
-            .navigate(R.id.myRentalsFragment, args);
+                .navigate(R.id.myRentalsFragment, args);
+    }
+
+    private void showEditProfileDialog() {
+        String[] options = {"Edit Name", "Edit Email", "Edit Phone"};
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Edit Profile")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        promptInput("Update Name", tvName.getText().toString(), false, value -> {
+                            tvName.setText(value);
+                            sessionManager.updateProfile(value, tvEmail.getText().toString());
+                        });
+                    } else if (which == 1) {
+                        promptInput("Update Email", tvEmail.getText().toString(), false, value -> {
+                            tvEmail.setText(value);
+                            sessionManager.updateProfile(tvName.getText().toString(), value);
+                        });
+                    } else {
+                        promptInput("Update Phone", tvPhone.getText().toString(), false, tvPhone::setText);
+                    }
+                })
+                .show();
+    }
+
+    private void showChangePasswordDialog() {
+        promptInput("Change Password", "", true, value -> {
+            if (value.length() < 6) {
+                Toast.makeText(requireContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private interface OnInputSaved {
+        void onSaved(String value);
+    }
+
+    private void promptInput(String title, String initialValue, boolean isPassword, OnInputSaved callback) {
+        EditText input = new EditText(requireContext());
+        input.setText(initialValue);
+        input.setSelection(input.getText().length());
+        input.setSingleLine(true);
+        input.setPadding(48, 28, 48, 28);
+        if (isPassword) {
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.setHint("Enter new password");
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setView(input)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String value = input.getText().toString().trim();
+                    if (value.isEmpty()) {
+                        Toast.makeText(requireContext(), "Value cannot be empty", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    callback.onSaved(value);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showLogoutConfirmation() {

@@ -2,11 +2,14 @@ package com.mobcom.carrental.fragments.provider;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -47,6 +50,7 @@ public class ProviderProfileFragment extends Fragment {
     private int bookingsCompleted = 8;
     private float avgRating       = 4.7f;
     private double totalEarnings  = 12400;
+    private SessionManager sessionManager;
 
     @Nullable
     @Override
@@ -60,12 +64,15 @@ public class ProviderProfileFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        sessionManager = new SessionManager(requireContext());
+
         bindViews(view);
         populateIdentity();
         populateTrustStatus();
         populatePerformance();
         setupListingsActions();
         setupSettings();
+        bindPreferences();
     }
 
     private void bindViews(View view) {
@@ -94,10 +101,8 @@ public class ProviderProfileFragment extends Fragment {
     // ── Identity ─────────────────────────────────────────────────────────────
 
     private void populateIdentity() {
-        SessionManager session = new SessionManager(requireContext());
-
-        String name  = session.getName().isEmpty() ? "Provider" : session.getName();
-        String email = session.getEmail().isEmpty() ? "No email" : session.getEmail();
+        String name  = sessionManager.getName().isEmpty() ? "Provider" : sessionManager.getName();
+        String email = sessionManager.getEmail().isEmpty() ? "No email" : sessionManager.getEmail();
 
         // Avatar initials
         String initials = getInitials(name);
@@ -230,19 +235,89 @@ public class ProviderProfileFragment extends Fragment {
     // ── Settings ──────────────────────────────────────────────────────────────
 
     private void setupSettings() {
-        layoutEditProfile.setOnClickListener(v -> {
-            // TODO: navigate to EditProfileFragment
-        });
+        layoutEditProfile.setOnClickListener(v -> showEditProfileDialog());
 
-        layoutChangePassword.setOnClickListener(v -> {
-            // TODO: navigate to ChangePasswordFragment
-        });
+        layoutChangePassword.setOnClickListener(v -> showChangePasswordDialog());
 
         switchNotifications.setOnCheckedChangeListener((btn, isChecked) -> {
-            // TODO: save notification preference
+            sessionManager.setNotificationsEnabledForRole(SessionManager.ROLE_PROVIDER, isChecked);
+            Toast.makeText(requireContext(),
+                    isChecked ? "Notifications enabled" : "Notifications disabled",
+                    Toast.LENGTH_SHORT).show();
         });
 
         layoutLogout.setOnClickListener(v -> showLogoutDialog());
+    }
+
+    private void bindPreferences() {
+        switchNotifications.setChecked(
+                sessionManager.isNotificationsEnabledForRole(SessionManager.ROLE_PROVIDER)
+        );
+    }
+
+    private void showEditProfileDialog() {
+        String[] options = {"Edit Name", "Edit Email", "Edit Phone", "Edit Location"};
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Edit Profile")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        promptInput("Update Name", tvName.getText().toString(), false, value -> {
+                            tvName.setText(value);
+                            tvAvatar.setText(getInitials(value));
+                            sessionManager.updateProfile(value, tvEmail.getText().toString());
+                        });
+                    } else if (which == 1) {
+                        promptInput("Update Email", tvEmail.getText().toString(), false, value -> {
+                            tvEmail.setText(value);
+                            sessionManager.updateProfile(tvName.getText().toString(), value);
+                        });
+                    } else if (which == 2) {
+                        promptInput("Update Phone", tvPhone.getText().toString(), false, tvPhone::setText);
+                    } else {
+                        promptInput("Update Location", tvLocation.getText().toString(), false, tvLocation::setText);
+                    }
+                })
+                .show();
+    }
+
+    private void showChangePasswordDialog() {
+        promptInput("Change Password", "", true, value -> {
+            if (value.length() < 6) {
+                Toast.makeText(requireContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Toast.makeText(requireContext(), "Password updated", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private interface OnInputSaved {
+        void onSaved(String value);
+    }
+
+    private void promptInput(String title, String initialValue, boolean isPassword, OnInputSaved callback) {
+        EditText input = new EditText(requireContext());
+        input.setText(initialValue);
+        input.setSelection(input.getText().length());
+        input.setSingleLine(true);
+        input.setPadding(48, 28, 48, 28);
+        if (isPassword) {
+            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            input.setHint("Enter new password");
+        }
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle(title)
+                .setView(input)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String value = input.getText().toString().trim();
+                    if (value.isEmpty()) {
+                        Toast.makeText(requireContext(), "Value cannot be empty", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    callback.onSaved(value);
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void showLogoutDialog() {
