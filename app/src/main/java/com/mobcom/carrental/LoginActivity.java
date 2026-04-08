@@ -12,6 +12,10 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.mobcom.carrental.utils.SessionManager;
+import com.mobcom.carrental.database.AppDatabase;
+import com.mobcom.carrental.database.entities.UserEntity;
+import com.mobcom.carrental.database.DatabaseInitializer;
+import java.util.UUID;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -41,6 +45,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        // Initialize database on first launch
+        DatabaseInitializer.initializeDatabase(this);
+        android.util.Log.d("LoginActivity", "Database initialization called");
 
         bindViews();
         setupTabs();
@@ -146,18 +154,42 @@ public class LoginActivity extends AppCompatActivity {
         tilEmail.setError(null);
         tilPassword.setError(null);
 
-        // Local demo credentials for testing
-        if (email.equals("customer@test.com") && password.equals("1234")) {
-            new SessionManager(this).login("C001", "Juan dela Cruz", email, SessionManager.ROLE_CUSTOMER);
-            goToCustomer();
-        } else if (email.equals("provider@test.com") && password.equals("1234")) {
-            new SessionManager(this).login("P001", "Maria Santos", email, SessionManager.ROLE_PROVIDER);
-            goToProvider();
-        } else if (email.equals("admin@test.com") && password.equals("1234")) {
-            new SessionManager(this).login("A001", "Admin User", email, SessionManager.ROLE_ADMIN);
-            goToAdmin();
-        } else {
-            tilPassword.setError("Invalid email or password");
+        // Check database for user
+        try {
+            android.util.Log.d("LoginActivity", "=== LOGIN ATTEMPT ===");
+            android.util.Log.d("LoginActivity", "Email: " + email);
+
+            AppDatabase db = AppDatabase.getInstance(this);
+            android.util.Log.d("LoginActivity", "Database instance obtained");
+
+            // Query all users to debug
+            java.util.List<com.mobcom.carrental.database.entities.UserEntity> allUsers = db.userDao().getAllUsers();
+            android.util.Log.d("LoginActivity", "Total users in DB: " + allUsers.size());
+            for (com.mobcom.carrental.database.entities.UserEntity u : allUsers) {
+                android.util.Log.d("LoginActivity", "  - " + u.email + " (" + u.role + ")");
+            }
+
+            com.mobcom.carrental.database.entities.UserEntity user = db.userDao().getUserByEmail(email);
+
+            if (user != null) {
+                android.util.Log.d("LoginActivity", "✓ User found: " + user.fullName + " (" + user.role + ")");
+                new SessionManager(this).login(user.userId, user.fullName, email, user.role);
+
+                // Navigate based on role
+                if (user.role.equals(SessionManager.ROLE_PROVIDER)) {
+                    goToProvider();
+                } else if (user.role.equals(SessionManager.ROLE_ADMIN)) {
+                    goToAdmin();
+                } else {
+                    goToCustomer();
+                }
+            } else {
+                android.util.Log.d("LoginActivity", "✗ User NOT found for email: " + email);
+                tilPassword.setError("Invalid email or password");
+            }
+        } catch (Exception e) {
+            android.util.Log.e("LoginActivity", "Login error", e);
+            tilPassword.setError("Error during login: " + e.getMessage());
         }
     }
 
@@ -199,8 +231,12 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!valid) return;
 
-        // For now, simulate successful registration
-        new SessionManager(this).login("NEW001", fullName, email, selectedRole);
+        // Generate userId and save to database
+        String userId = UUID.randomUUID().toString();
+        ensureUserExists(userId, fullName, email, selectedRole);
+
+        // Login and navigate
+        new SessionManager(this).login(userId, fullName, email, selectedRole);
 
         if (selectedRole.equals(SessionManager.ROLE_PROVIDER)) {
             goToProvider();
@@ -230,6 +266,36 @@ public class LoginActivity extends AppCompatActivity {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    // ── Database User Management ──────────────────────────────────────────────
+
+    private void ensureUserExists(String userId, String fullName, String email, String role) {
+        try {
+            AppDatabase db = AppDatabase.getInstance(this);
+            UserEntity existingUser = db.userDao().getUserByEmail(email);
+
+            if (existingUser == null) {
+                // Create new user
+                UserEntity user = new UserEntity();
+                user.userId = userId;
+                user.email = email;
+                user.fullName = fullName;
+                user.phone = "";
+                user.role = role;
+                user.verificationStatus = "PENDING";
+                user.createdAt = System.currentTimeMillis();
+                user.rating = 0.0;
+                user.totalBookings = 0;
+
+                db.userDao().insert(user);
+                android.util.Log.d("LoginActivity", "✓ Created user: " + fullName + " (" + email + ")");
+            } else {
+                android.util.Log.d("LoginActivity", "✓ User already exists: " + email);
+            }
+        } catch (Exception e) {
+            android.util.Log.e("LoginActivity", "Error ensuring user exists", e);
+        }
     }
 
 }

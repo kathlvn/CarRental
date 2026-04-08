@@ -199,8 +199,8 @@ public class ExploreFragment extends Fragment {
             allBudgetCars.clear();
 
             for (CarEntity carEntity : cars) {
-                // Get the provider's actual name
-                UserEntity provider = db.userDao().getUserById(carEntity.providerId);
+                // Get the provider's actual name - carEntity.providerId is the email
+                UserEntity provider = db.userDao().getUserByEmail(carEntity.providerId);
                 String providerName = (provider != null) ? provider.fullName : carEntity.providerId;
 
                 android.util.Log.d("ExploreFragment", "Creating car: " + carEntity.name + " with provider: " + providerName);

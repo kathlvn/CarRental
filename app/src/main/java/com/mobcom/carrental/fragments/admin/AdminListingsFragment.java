@@ -185,11 +185,18 @@ public class AdminListingsFragment extends Fragment
         AppDatabase db = AppDatabase.getInstance(requireContext());
         java.util.List<CarEntity> carEntities = db.carDao().getAllCars();
 
+        android.util.Log.d("AdminListingsFragment", "Loaded " + carEntities.size() + " cars from database");
+
         allListings.clear();
         for (CarEntity car : carEntities) {
-            // Get provider info
-            UserEntity provider = db.userDao().getUserById(car.providerId);
-            if (provider == null) continue;
+            android.util.Log.d("AdminListingsFragment", "Car: " + car.name + " | Status: " + car.approvalStatus + " | Provider: " + car.providerId);
+
+            // Get provider info - providerId is actually the email
+            UserEntity provider = db.userDao().getUserByEmail(car.providerId);
+            if (provider == null) {
+                android.util.Log.d("AdminListingsFragment", "  → Provider not found for email: " + car.providerId + ", skipping");
+                continue;
+            }
 
             // Map approval status to AdminListing.Status
             AdminListing.Status status = mapApprovalStatus(car.approvalStatus);
@@ -225,6 +232,8 @@ public class AdminListingsFragment extends Fragment
 
             allListings.add(listing);
         }
+
+        android.util.Log.d("AdminListingsFragment", "Total listings after processing: " + allListings.size());
 
         // Fallback to empty state if no listings
         if (allListings.isEmpty()) {

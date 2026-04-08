@@ -57,6 +57,14 @@ public class DatabaseInitializer {
         Log.d(TAG, "Populating users");
         List<UserEntity> users = new ArrayList<>();
 
+        // Test Accounts (for login testing)
+        users.add(new UserEntity("TEST_C001", "Test Customer", "customer@test.com", "+639001234567",
+                "CUSTOMER", "verified"));
+        users.add(new UserEntity("TEST_P001", "Test Provider", "provider@test.com", "+639001234568",
+                "PROVIDER", "verified"));
+        users.add(new UserEntity("TEST_A001", "Test Admin", "admin@test.com", "+639001234569",
+                "ADMIN", "verified"));
+
         // Customers
         users.add(new UserEntity("C001", "Sophia Reyes", "sophia.reyes@email.com", "+639155234567",
                 "CUSTOMER", "verified"));

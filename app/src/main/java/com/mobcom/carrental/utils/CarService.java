@@ -54,7 +54,10 @@ public class CarService {
         car.lastMaintenanceDate = System.currentTimeMillis();
         car.approvalStatus = "PENDING";
 
+        android.util.Log.d("CarService", "Adding new car: " + name + " | Provider: " + providerId + " | Status: PENDING");
         db.carDao().insert(car);
+        android.util.Log.d("CarService", "✓ Car inserted successfully with ID: " + carId);
+
         return carId;
     }
 
