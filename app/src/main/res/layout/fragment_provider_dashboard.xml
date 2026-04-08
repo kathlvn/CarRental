@@ -4,22 +4,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/background_light">
 
-    <!-- App Bar -->
+    <!-- App Bar Header -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#1A237E"
-        app:elevation="0dp">
+        android:background="@color/primary_accent"
+        app:elevation="0dp"
+        android:tag="noScroll">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="36dp"
+            android:paddingBottom="24dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -39,38 +40,57 @@
                         android:layout_height="wrap_content"
                         android:text="Good morning,"
                         android:textSize="13sp"
-                        android:textColor="#80FFFFFF" />
+                        android:fontFamily="sans-serif"
+                        android:textColor="#A0A0B0" />
 
                     <TextView
                         android:id="@+id/tvProviderName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Provider"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@android:color/white" />
+                        android:textSize="22sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@android:color/white"
+                        android:layout_marginTop="4dp" />
 
                 </LinearLayout>
 
-                <!-- Notification bell -->
-                <TextView
-                    android:id="@+id/tvNotifBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="4dp"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:background="@drawable/bg_status_badge"
-                    android:visibility="gone" />
+                <!-- Notification Bell -->
+                <FrameLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp">
+
+                    <ImageView
+                        android:id="@+id/ivNotificationBell"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_notification_bell"
+                        android:contentDescription="Notifications"
+                        android:scaleType="centerInside"
+                        android:tint="@android:color/white"
+                        android:layout_gravity="center" />
+
+                    <TextView
+                        android:id="@+id/tvNotifBadge"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:gravity="center"
+                        android:text="3"
+                        android:textSize="10sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/bg_notif_badge"
+                        android:layout_gravity="top|end"
+                        android:visibility="gone" />
+
+                </FrameLayout>
 
             </LinearLayout>
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Scrollable content -->
+    <!-- Scrollable Content -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -80,350 +100,409 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="80dp">
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="100dp">
 
-            <!-- ── Stats Row ───────────────────────────────────────── -->
+            <!-- QUICK ACTIONS -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="4dp">
-
-                <!-- Earnings -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="💰"
-                            android:textSize="22sp" />
-
-                        <TextView
-                            android:id="@+id/tvTotalEarnings"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#1A237E"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Earnings"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Active rentals -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🔑"
-                            android:textSize="22sp" />
-
-                        <TextView
-                            android:id="@+id/tvActiveRentals"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#2E7D32"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Active"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="4dp">
-
-                <!-- Pending -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="⏳"
-                            android:textSize="22sp" />
-
-                        <TextView
-                            android:id="@+id/tvPendingCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#FF9800"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Pending"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Total cars -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="🚗"
-                            android:textSize="22sp" />
-
-                        <TextView
-                            android:id="@+id/tvTotalCars"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            android:textColor="#1A237E"
-                            android:layout_marginTop="4dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cars Listed"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-            </LinearLayout>
-
-            <!-- ── Quick Actions ───────────────────────────────────── -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="QUICK ACTIONS"
-                android:textSize="11sp"
-                android:textColor="#9E9E9E"
-                android:letterSpacing="0.1"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
+                android:layout_marginBottom="24dp"
+                android:spacing="16dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddCar"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="8dp"
                     android:text="+ Add Car"
                     android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
                     app:cornerRadius="20dp"
+                    app:backgroundTint="@color/primary_accent"
                     style="@style/Widget.Material3.Button" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnViewBookings"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="View Bookings"
                     android:textSize="13sp"
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/primary_accent"
                     app:cornerRadius="20dp"
+                    app:strokeColor="@color/primary_accent"
+                    app:strokeWidth="2dp"
                     style="@style/Widget.Material3.Button.OutlinedButton" />
 
             </LinearLayout>
 
-            <!-- ── Pending Requests ────────────────────────────────── -->
+            <!-- YOUR STATS Header -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="YOUR STATS"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/label_text"
+                android:letterSpacing="0.08"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Stats Row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+                android:spacing="8dp">
+
+                <!-- Monthly Earnings -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_stat_icon_circle"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_money"
+                                android:contentDescription="Earnings"
+                                android:tint="@color/primary_accent" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvTotalEarnings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="₱48,980"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary_accent"
+                            android:layout_marginTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Monthly Earnings"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Active Rentals -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_stat_icon_circle"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_car"
+                                android:contentDescription="Active Rentals"
+                                android:tint="@color/primary_accent" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvActiveRentals"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary_accent"
+                            android:layout_marginTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Active Rentals"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- Stats Row 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="24dp"
+                android:spacing="8dp">
+
+                <!-- Pending Rentals -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_stat_icon_circle"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_hourglass"
+                                android:contentDescription="Pending"
+                                android:tint="@color/primary_accent" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvPendingCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="8"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary_accent"
+                            android:layout_marginTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Pending Rentals"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Total Cars Listed -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="@android:color/white">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_stat_icon_circle"
+                            android:gravity="center"
+                            android:paddingHorizontal="8dp">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_vehicle"
+                                android:contentDescription="Cars Listed"
+                                android:tint="@color/primary_accent" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvTotalCars"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="10"
+                            android:textSize="16sp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary_accent"
+                            android:layout_marginTop="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cars Listed"
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+
+            <!-- PENDING BOOKINGS Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="PENDING REQUESTS"
+                    android:text="PENDING BOOKINGS"
                     android:textSize="11sp"
-                    android:textColor="#9E9E9E"
-                    android:letterSpacing="0.1" />
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/label_text"
+                    android:letterSpacing="0.08" />
 
                 <TextView
                     android:id="@+id/tvSeeAllBookings"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="See all →"
-                    android:textSize="12sp"
-                    android:textColor="#1A237E"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:text="See All"
+                    android:textSize="11sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/primary_accent" />
 
             </LinearLayout>
 
-            <!-- Pending bookings list -->
+            <!-- Pending Bookings RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPendingBookings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"
-                android:clipToPadding="false" />
+                android:layout_marginBottom="24dp"
+                android:nestedScrollingEnabled="false" />
 
-            <!-- Empty pending state -->
+            <!-- No Pending Bookings Layout -->
             <LinearLayout
                 android:id="@+id/layoutNoPending"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="120dp"
                 android:orientation="vertical"
                 android:gravity="center"
-                android:paddingVertical="24dp"
+                android:layout_marginBottom="24dp"
                 android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="✅ No pending requests"
+                    android:text="No pending bookings"
                     android:textSize="14sp"
-                    android:textColor="#9E9E9E" />
+                    android:fontFamily="sans-serif"
+                    android:textColor="@color/label_text" />
 
             </LinearLayout>
 
-            <!-- ── Occupied Dates Calendar ─────────────────────────── -->
+            <!-- OCCURRED DATES Header -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="12dp">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="OCCUPIED DATES"
+                    android:text="OCCURRED DATES"
                     android:textSize="11sp"
-                    android:textColor="#9E9E9E"
-                    android:letterSpacing="0.1" />
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/label_text"
+                    android:letterSpacing="0.08" />
 
-                <!-- Month navigation -->
-                <TextView
+                <!-- Month Navigation -->
+                <ImageButton
                     android:id="@+id/btnPrevMonth"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:gravity="center"
-                    android:text="‹"
-                    android:textSize="20sp"
-                    android:textColor="#1A237E"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:src="@drawable/ic_chevron_left"
+                    android:contentDescription="Previous month"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside"
+                    android:tint="@color/primary_accent" />
 
                 <TextView
                     android:id="@+id/tvCurrentMonth"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
+                    android:text="April 2026"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textColor="@color/primary_accent"
                     android:paddingHorizontal="8dp" />
 
-                <TextView
+                <ImageButton
                     android:id="@+id/btnNextMonth"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:gravity="center"
-                    android:text="›"
-                    android:textSize="20sp"
-                    android:textColor="#1A237E"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:src="@drawable/ic_chevron_right"
+                    android:contentDescription="Next month"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside"
+                    android:tint="@color/primary_accent" />
 
             </LinearLayout>
 
+            <!-- Calendar Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeWidth="0dp">
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@android:color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -436,36 +515,36 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="12dp">
 
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="S" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="S" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="M" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="M" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="T" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="T" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="W" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="W" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="T" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="T" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="F" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="F" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
                         <TextView android:layout_width="0dp" android:layout_height="wrap_content"
                             android:layout_weight="1" android:gravity="center"
-                            android:text="S" android:textSize="12sp"
-                            android:textColor="#9E9E9E" android:textStyle="bold" />
+                            android:text="S" android:textSize="12sp" android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/label_text" />
 
                     </LinearLayout>
 
@@ -474,42 +553,45 @@
                         android:id="@+id/calendarGrid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:columnCount="7" />
+                        android:columnCount="7"
+                        android:rowCount="6" />
 
                     <!-- Legend -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginTop="12dp"
+                        android:layout_marginTop="16dp"
                         android:gravity="center">
 
                         <View
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:background="@drawable/bg_step_active"
-                            android:layout_marginEnd="4dp" />
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/bg_calendar_occupied"
+                            android:layout_marginEnd="6dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Occupied"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E"
-                            android:layout_marginEnd="16dp" />
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text"
+                            android:layout_marginEnd="20dp" />
 
                         <View
-                            android:layout_width="12dp"
-                            android:layout_height="12dp"
-                            android:background="@drawable/bg_step_inactive"
-                            android:layout_marginEnd="4dp" />
+                            android:layout_width="8dp"
+                            android:layout_height="8dp"
+                            android:background="@drawable/bg_calendar_available"
+                            android:layout_marginEnd="6dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Available"
-                            android:textSize="11sp"
-                            android:textColor="#9E9E9E" />
+                            android:textSize="10sp"
+                            android:fontFamily="sans-serif"
+                            android:textColor="@color/label_text" />
 
                     </LinearLayout>
 

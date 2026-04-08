@@ -2,4 +2,30 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Design Palette -->
+    <!-- Main Accent - Dark Navy -->
+    <color name="primary_accent">#181834</color>
+    <!-- Secondary Blue Accent -->
+    <color name="secondary_accent">#2b2b67</color>
+    <!-- Labels/Secondary Text -->
+    <color name="label_text">#b4b4b4</color>
+    <!-- Details/Tertiary Text -->
+    <color name="detail_text">#737373</color>
+
+    <!-- Light Background -->
+    <color name="background_light">#F8F8F8</color>
+    <!-- Text Colors -->
+    <color name="text_primary">#181834</color>
+    <color name="text_secondary">#b4b4b4</color>
+    <color name="text_tertiary">#737373</color>
+
+    <!-- Status Colors -->
+    <color name="status_success">#2E7D32</color>
+    <color name="status_pending">#FF9800</color>
+    <color name="status_warning">#FF5722</color>
+
+    <!-- Transparent Variants -->
+    <color name="primary_accent_50">#0D0C1A</color>
+    <color name="primary_accent_80">#433F5C</color>
 </resources>

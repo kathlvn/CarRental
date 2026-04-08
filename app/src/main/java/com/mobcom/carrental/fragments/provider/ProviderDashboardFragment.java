@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -36,7 +37,8 @@ public class ProviderDashboardFragment extends Fragment
 
     private TextView tvGreeting, tvProviderName, tvNotifBadge;
     private TextView tvTotalEarnings, tvActiveRentals, tvPendingCount, tvTotalCars;
-    private TextView tvCurrentMonth, btnPrevMonth, btnNextMonth;
+    private TextView tvCurrentMonth;
+    private ImageButton btnPrevMonth, btnNextMonth;
     private TextView tvSeeAllBookings;
     private RecyclerView rvPendingBookings;
     private LinearLayout layoutNoPending;
